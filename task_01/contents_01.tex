@@ -17,8 +17,9 @@
 	
 \subsubsection{Vorteile von Grid-Technologie}
 	\begin{itemize}
-	  \item Gemeinsames Nutzen von teurer Hardware
-	  \item Vereinfachung der Nutzung und erh\"ohte Portabilit\"at
+		\item H\"ohere Rechengeschwindigkeit	
+		\item Gemeinsames Nutzen von teurer Hardware
+		\item Vereinfachung der Nutzung und erh\"ohte Portabilit\"at
 	\end{itemize}
 	
 \subsubsection{Anwendungen im Grid und deren Besonderheiten}
@@ -33,21 +34,38 @@
 	
 	Sie vermittelt zwischen den laufenden Anwenungen und den lokalen
 	Betriebssystemen der einzelnen Rechner/Knoten.
-
+	Die Grid-Middleware \"ubernimmt das Scheduling der dem Grid \"ubegerbenen
+	Aufgabgen und verwaltet diese in Warteschlangen.
+	Die Kommunikation \"uber den Zustand der Aufgaben wird von ihr \"ubernommen.
 	Durch ihre zentrale Stellung ergm\"oglicht die Grid-Middleware auch
 	das Accounting und Billing des Grids.
-	Sie leitet die nötigen Informationen an die entsprechenden Stellen weiter.
+	Sie leitet die n\"otigen Informationen an die entsprechenden Stellen weiter.
+	Weiterhin ist sie entscheidend f\"ur die Sicherheit des Grids.
+	Sie stellt Single Sign-On Funktionalit\"at zur Verf\"ugung und
+	schottet die einzelnen Jobs voneinander ab.
+	Die Grid-Middleware ist aber auch transparent und l\"asst sich durch APIs
+	von anderen Grid-Middleware Instanzen oder Implemetierungen nutzen.
 
 \subsection{Cluster Computing}
-	\subsubsection{Skizziere eine Cluster Architektur und beschreibe die
-	Wichtigsten Komponenten}
-	\subsubsection{Welche Warteschlangenstrategien gibt es? Welche w\"urdest du
-	bevorzugen? Begr\"unde!}
+	\subsubsection{Skizziere eine Cluster Architektur und beschreibe die wichtigsten Komponenten}
+	%pics oder es ist nicht wahr....
+
+	Die Basis eines Clusters bilden die Worker-Nodes.
+	Sie sind die Computer auf denen die Berechnungen stattfinden.
+	\"Ublicherweise sind sie sind meist mit einem weiteren Systemen \"uber
+	eine Hochgeschwindigkeitsnetzwerk verbunden.
+	Dabei handelt es sich um ein Fileserver der f\"ur alle Worker-Nodes
+	die gleichen Daten bereitstellt.
+	Meist gibt es zus\"atzlich noch einen zentralen Server das Scheduling und ähnlich Funktionalitaeten
+	bereitstellt.
+	Diese Aufgabe des Eingangs kann aber auch von einer Worker-Node \"ubernommen werden.
+
+	\subsubsection{Welche Warteschlangenstrategien gibt es? Welche w\"urdest du bevorzugen? Begr\"unde!}
 	\begin{description}
 		\item[FCFS, First come - first serve] \hfill \\
 			Die Auftr\"age werden in der Reihenfolge in der sie zeitlich eintreffen abgearbeitet.
 			Der Vorteil ist, das diese Strategie sehr transparent f\"ur den Nutzer ist.
-			Große bzw. Lange Auftr\"age können jedoch die Warteschlange verstopfen,
+			Große bzw. Lange Auftr\"age k\"onnen jedoch die Warteschlange verstopfen,
 			da die erwartete Laufzeit keine Rolle f\"ur die Reihenfolge der Abarbeitung spielt.
 		\item[Backfilling] \hfill \\
 			Auftr\"age die sp\"ater eingereicht werden k\"onnen vor anderen Auftr\"agen in der
@@ -59,7 +77,9 @@
 			Der Auftrag mit der jeweil k\"urzesten (erwarteten) Laufzeit, wird zuerst ausgef\"urhrt.
 			Entscheiden f\"ur das korrekt Funktionieren dieses Warteschlangenstraegie ist,
 			dass die Benutzer die laufzeit des Auftrages richtig angeben.
-			Dies ist jedoch nicht immer möglich,
+			Dies ist jedoch nicht immer m\"oglich,
 			so das es sehr lange dauern kann bis Auftr\"age mit langer erwarteter Laufzeit angestossen werden.
 	\end{description}
+	%Srsly?
+	Aufgrund der hohen Effizienz w\"urden wir uns für die Backfilling-Strategie entscheiden.
 \subsection{Parallelisierung}
