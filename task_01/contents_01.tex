@@ -34,12 +34,26 @@
 	Sie vermittelt zwischen den laufenden Anwenungen und den lokalen
 	Betriebssystemen der einzelnen Rechner/Knoten.
 
-	%Nicht auch accounting und blubbs?
-	
+	Durch ihre zentrale Stellung ergm\"oglicht die Grid-Middleware auch
+	das Accounting und Billing des Grids.
+	Sie leitet die nötigen Informationen an die entsprechenden Stellen weiter.
+
 \subsection{Cluster Computing}
 	\subsubsection{Skizziere eine Cluster Architektur und beschreibe die
 	Wichtigsten Komponenten}
 	\subsubsection{Welche Warteschlangenstrategien gibt es? Welche w\"urdest du
 	bevorzugen? Begr\"unde!}
-	
+	\begin{description}
+		\item[FCFS, First come - first serve] \hfill \\
+			Die Auftr\"age werden in der Reihenfolge in der sie zeitlich eintreffen abgearbeitet.
+			Der Vorteil ist, das diese Strategie sehr transparent f\"ur den Nutzer ist.
+			Große bzw. Lange Auftr\"age können jedoch die Warteschlange verstopfen,
+			da die erwartete Laufzeit keine Rolle f\"ur die Reihenfolge der Abarbeitung spielt.
+		\item[SJF, Shortest Job First] \hfill \\
+			Der Auftrag mit der jeweil k\"urzesten (erwarteten) Laufzeit, wird zuerst ausgef\"urhrt.
+			Entscheiden f\"ur das korrekt Funktionieren dieses Warteschlangenstraegie ist,
+			dass die Benutzer die laufzeit des Auftrages richtig angeben.
+			Dies ist jedoch nicht immer möglich,
+			so das es sehr lange dauern kann bis Auftr\"age mit langer erwarteter Laufzeit angestossen werden.
+	\end{description}
 \subsection{Parallelisierung}
