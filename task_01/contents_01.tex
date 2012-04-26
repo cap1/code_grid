@@ -49,6 +49,12 @@
 			Der Vorteil ist, das diese Strategie sehr transparent f\"ur den Nutzer ist.
 			Große bzw. Lange Auftr\"age können jedoch die Warteschlange verstopfen,
 			da die erwartete Laufzeit keine Rolle f\"ur die Reihenfolge der Abarbeitung spielt.
+		\item[Backfilling] \hfill \\
+			Auftr\"age die sp\"ater eingereicht werden k\"onnen vor anderen Auftr\"agen in der
+			Warteschlange ausgef\"uhrt werden, wenn sie diese nicht verz\"ogern.
+			Diese Strategie ben\"otigt auch m\"oglichst exakte Angaben \"uber die erwartete Laufzeit
+			der Auftr\"age.
+			Insgesamt kann aber eine besser Auslastung als durch FCFS erreicht werden.	
 		\item[SJF, Shortest Job First] \hfill \\
 			Der Auftrag mit der jeweil k\"urzesten (erwarteten) Laufzeit, wird zuerst ausgef\"urhrt.
 			Entscheiden f\"ur das korrekt Funktionieren dieses Warteschlangenstraegie ist,
