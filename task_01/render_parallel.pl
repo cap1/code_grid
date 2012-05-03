@@ -31,8 +31,8 @@ $yrest = $height % $cpus;
 sub main
 {
 	init();
-	addstr($height+3,0,
-			"CPUS: $cpus 
+	addstr($height+3,0,"
+			CPUS: $cpus 
 			XSTEP: $xstep 
 			YSTEP: $ystep 
 			XREST: $xrest 
@@ -49,6 +49,7 @@ sub main
 			}
 		}
 	}
+	#here be dragons
 	if($xrest != 0)
 	{
 
