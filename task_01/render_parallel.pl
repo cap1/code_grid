@@ -12,36 +12,31 @@ my $width = shift(@ARGV);
 my $height = shift(@ARGV);
 my $no_gfx = 0;
 my $instancecount = 0;
-my $cpus = 4;
+#my $cpus = 4;
+my $cpus = getCPUNumber();
 
 my $xstep = 0;
 my $ystep = 0;
 my $xrest = 0;
 my $yrest = 0;
 
-#if($width % $cpus != 0 or $height % $cpus !=0)
-#{
-#		$cpus--;
-#}
-
-
 $xstep = int($width/$cpus);
 $xrest = $width % $cpus;
 $ystep = int($height/$cpus);
 $yrest = $height % $cpus;
 
-#my $xstep = 5;
-#my $ystep = 5;
-#my $cpus = getCPUNumber();
-#$cpus++;
-
-
 &main();
+
 
 sub main
 {
 	init();
-	addstr($height+3,0,"CPUS: $cpus XSTEP: $xstep YSTEP: $ystep XREST: $xrest YREST: $yrest");
+	addstr($height+3,0,
+			"CPUS: $cpus 
+			XSTEP: $xstep 
+			YSTEP: $ystep 
+			XREST: $xrest 
+			YREST: $yrest");
 	for ( my $y = 0; $y < $height-$yrest; $y+= $ystep )
 	{
 		for ( my $x = 0; $x < $width-$xrest; $x += $xstep )
@@ -67,7 +62,6 @@ sub main
 
 }
 
-#==================================================================================
 
 sub cleanup
 {
@@ -98,20 +92,9 @@ sub init
 	}
 }
 
-
-#not used so far
-sub calculate_stepwidths
-{
-	my ($width,$height) = @_;
-	my $square = $width*$height;
-	
-
-}
-
-
-
 #render function
-#Note, the $instance variable is not needed for the actual parallelization. It is just used for making it look nicely.
+#Note, the $instance variable is not needed for the actual parallelization. 
+#It is just used for making it look nicely.
 sub render 
 {
 	my ($SRn, $ERn, $SCn, $ECn,$instance) = @_;
