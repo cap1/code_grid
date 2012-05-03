@@ -12,14 +12,28 @@ my $width = shift(@ARGV);
 my $height = shift(@ARGV);
 my $no_gfx = 0;
 my $instancecount = 0;
-
-
-
-my $xstep = 5;
-my $ystep = 5;
-#my $cpus = getCPUNumber();
 my $cpus = 4;
 
+my $xstep = 0;
+my $ystep = 0;
+my $xrest = 0;
+my $yrest = 0;
+
+#if($width % $cpus != 0 or $height % $cpus !=0)
+#{
+#		$cpus--;
+#}
+
+
+$xstep = int($width/$cpus);
+$xrest = $width % $cpus;
+$ystep = int($height/$cpus);
+$yrest = $height % $cpus;
+
+#my $xstep = 5;
+#my $ystep = 5;
+#my $cpus = getCPUNumber();
+#$cpus++;
 
 
 &main();
@@ -27,18 +41,27 @@ my $cpus = 4;
 sub main
 {
 	init();
-
-	for ( my $y = 0; $y < $height; $y+= $ystep )
+	addstr($height+3,0,"CPUS: $cpus XSTEP: $xstep YSTEP: $ystep XREST: $xrest YREST: $yrest");
+	for ( my $y = 0; $y < $height-$yrest; $y+= $ystep )
 	{
-		for ( my $x = 0; $x < $width; $x += $xstep )
+		for ( my $x = 0; $x < $width-$xrest; $x += $xstep )
 		{
 			$instancecount++;
-			render($x,$x+$xstep,$y,$y+$ystep,$instancecount);
+			render($y,$y+$ystep,$x,$x+$xstep,$instancecount);
 			if($instancecount == $cpus)
 			{
 				$instancecount = 0;
 			}
 		}
+	}
+	if($xrest != 0)
+	{
+
+		render(0,$height-1,$width-$xrest,$width,++$instancecount);
+	}
+	if($yrest != 0)
+	{
+		render($height-$yrest,$height,0,$width,++$instancecount);
 	}
 	cleanup();
 
@@ -75,6 +98,8 @@ sub init
 	}
 }
 
+
+#not used so far
 sub calculate_stepwidths
 {
 	my ($width,$height) = @_;
@@ -90,12 +115,12 @@ sub calculate_stepwidths
 sub render 
 {
 	my ($SRn, $ERn, $SCn, $ECn,$instance) = @_;
-	for (my $i = $SRn; $i<=$ERn;$i++)
+	for (my $i = $SRn; $i<$ERn;$i++)
 	{
-		for (my $j=$SCn; $j<=$ECn; $j++)
+		for (my $j=$SCn; $j<$ECn; $j++)
 		{
 			attron(COLOR_PAIR($instance));
-			addstr($i,$j,"x");
+			addstr($i,$j,"X");
 			attroff(COLOR_PAIR($instance));
 		}
 	}
