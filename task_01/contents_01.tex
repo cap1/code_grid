@@ -3,7 +3,9 @@
 \subsection{Aufgabe 1 - Grid Computing}
 
 \subsubsection{Definiere Grid}
-	\quotation{A computational grid is a hardware and software infrastructure that provides dependable, consistent, pervasive, and inexpensive access to high-end computational capabilities.}
+\quotation{\textsl{``A computational grid is a hardware and software infrastructure that provides dependable, consistent, pervasive, and inexpensive access to high-end computational capabilities.''}}
+\\
+
 	In einem Grid werden Ressourcen verwaltet und verteilt.
 	Zus\"atzliche Resourcen k\"onnen bei Bedarf im Grid bereitgestellt werden.
 	Die Ressourcen k\"onnen dabei auf verschiedene Weise gekoppelt werden:
@@ -58,9 +60,10 @@
 	die gleichen Daten bereitstellt.
 	Meist gibt es zus\"atzlich noch einen zentralen Server das Scheduling und ähnlich Funktionalit\"aten
 	bereitstellt.
-	Diese Aufgabe des Eingangs kann aber auch von einer Worker-Node \"ubernommen werden.
+	Diese Aufgabe des Eingangspunktes zum Grid kann aber auch von einer Worker-Node \"ubernommen werden.
 
 	\subsubsection{Welche Warteschlangenstrategien gibt es? Welche w\"urdest du bevorzugen? Begr\"unde!}
+	Hier ein Auswahl bekannter Scheduling Verfahren.
 	\begin{description}
 		\item[FCFS, First come - first serve] \hfill \\
 			Die Auftr\"age werden in der Reihenfolge in der sie zeitlich eintreffen abgearbeitet.
@@ -82,5 +85,7 @@
 	\end{description}
 	%Srsly?
 	Aufgrund der hohen Effizienz w\"urden wir uns für die Backfilling-Strategie entscheiden.
+	Ein Scheduling Verfahren sollte jedoch immer entsprechend der jeweiligen Strukturen gewählt werden.
+	Wichtige Paramenter dafür sind Effizienz, Durchsatz, Faireness, Antwortzeit und Transparenz.
 \subsection{Parallelisierung}
 \lstinputlisting[language=Perl]{task_01/render_parallel.pl}
