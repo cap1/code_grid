@@ -9,8 +9,19 @@
 		Durch verschiedene Schalter lassen sich die Parameter \"ubergeben,
 		beispielsweise für eine mindestens benötigte Menge an Arbeitsspeicher.
 
+		Üblicherweise wir \texttt{qsub} ein Shell-Script übergeben,
+		welches den Aufruf übernimmt und die Parameter enthält.
+		Zusätzlich können in diesem Script noch Information an PBS übergeben werden.
+		Dies sind zum einen Konfigurationsparamenter für PBS,
+		zum anderen Kontaktinformationen zum Besitzer des Jobs.
+
 	\item[\texttt{qdel}] \hfill \\
+		Mit diesem Befehl lassen sich in der Warteschlange stehende Jobs aus dieser entfernen.
+		Dazu muss dem Befehl die von \texttt{qsub} zurückgelieferte Job-ID übergeben werden.
+
 	\item[\texttt{qstat}] \hfill \\
+		Diser Befehl erlaub das Verfolgen eines dem Grid übergebenen Jobs mittels der Job-ID.
+
 	\item[\texttt{pbsnodes}] \hfill \\
 \end{description}
 
