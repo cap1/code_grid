@@ -2,28 +2,56 @@
 use strict;
 use warnings;
 use Getopt::Long;
-
-my $inputfile = "";
-my $width = 0;
-my $heigth = 0;
-my $outputfile = "";
+my $inputfiles = "";
+my $width = 640;
+my $heigth = 480;
+my $outputdir = "";
 my $maxnodes  = 0;
+my $povray = "/usr/bin/povray";
+my $help = 0;
+my $usage = <<EOL;
+USAGE:
+	render-parallel [options] inputfile...
+	--width
+	--height
+	--outputdir
+	--maxnodes
+	--help 	Display this help
+EOL
 
 
-my $result = GetOptions (  "input=s" => \$inputfile, 
-			"width=i" => \$width, 
+
+my $result = GetOptions ("width=i" => \$width, 
 			"height=i" => \$heigth,
-			"ouput=s" => \$outputfile,
+			"ouputdir=s" => \$outputdir,
 			"maxnodes=i" => \$maxnodes,
+			"help"       => \$help,
 		     );
 
-my $cpus;
-if ($maxnodes != 0) {
+
+my @inputfiles = @ARGV;
+
+my $cpus = &getCPUNumber();
+if ($maxnodes != 0 and not($maxnodes > $cpus)) {
 	$cpus = $maxnodes;
 }
-else {
-	$cpus = &getCPUNumber();
+
+if ($help)
+{
+	print($usage);
+	exit;
 }
+
+
+my @pics = ();
+
+
+foreach my $if (@inputfiles)
+{
+	my %pic = ( filename => $if, jobs => {}); 
+	push(@pics,\%pic);
+}
+
 
 my $xstep = 0;
 my $ystep = 0;
@@ -63,20 +91,6 @@ sub main
 	if($yrest != 0)
 	{
 		&render($heigth-$yrest,$heigth,0,$width);
-	}
-
-}
-
-#render function
-sub render 
-{
-	my ($SRn, $ERn, $SCn, $ECn) = @_;
-	for (my $i = $SRn; $i<$ERn;$i++)
-	{
-		for (my $j=$SCn; $j<$ECn; $j++)
-		{
-
-		}
 	}
 
 }
