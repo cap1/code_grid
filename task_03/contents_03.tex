@@ -21,16 +21,29 @@
 
 	\item[\texttt{qstat}] \hfill \\
 		Diser Befehl erlaub das Verfolgen eines dem Grid übergebenen Jobs mittels der Job-ID.
+		Weiterhin ermöglicht er das Überwachen von Warteschlangen (Queues) und
+		Batch-Servern.
 
 	\item[\texttt{pbsnodes}] \hfill \\
+		Mit diesem Befehl lassen sich Informationen zu Nodes im Cluster ermitteln und
+		Einstellungen an diesen vornehmen.
+		Der Aufruf ohne Parameter gibt Informationen zu allen im Cluster bekannten
+		Nodes aus.
 \end{description}
 
 
 \subsection{PBS System im Informatik Pool}
 \subsubsection{Wieviele Knoten sind vorhanden?}
+	Im Cluster sind 54 Knoten vorhanden (\texttt{pbdsnodes -l | wc -l}).
 \subsubsection{Wie lassen sich alle freien Knoten anzeigen?}
+	\texttt{pbsnodes -l free}
 \subsubsection{Welche Warteschlangen sind definiert und wie lange d\"urfen Jobs laufen?}
-
+	Es sind folgende Warteschlangen definiert: 
+	\textsl{shanghai, seoul, sao-paulo, server, verylong, batch, moscow, delhi,
+	karachi, bombay, istanbul}.
+	Bei keiner der Warteschlangen sind Einstellungen bezüglich der Laufzeit
+	vorgenommen.
+	%sicher? solllte doch mit qstat -q auslesbar sein
 
 \subsection{Paralellisierung mit PBS}
 
