@@ -74,10 +74,17 @@ sub createjob
 {
 	my ($filename,$startrow,$startcol,$endrow,$endcol,$outputwidth,$outputheigth) = @_;
 	my $jobstring  = "$povray -I$filename -W$outputwidth -H$outputheigth ";
-	   $jobstring .= "-SR$startrow -SC$startcol -ER$endrow -EC$endcol";
-	my $jobid =
-	 
+	$shortfn = basename($filename);
+	my $dirname = "$outputdir" . "/" . $shortfn;
+	   $jobstring .= "-SR$startrow -SC$startcol -ER$endrow -EC$endcol -O$dirname/";
+	my $jobhash = md5($jobstring);
+	mkdir "$dirname/$jobhash";
+	$jobstring .= $jobhash . "/output.tga";
 	
+	open(FH,">$dirname/$jobhash/run.sh") || die "Could not open output file\n"; 
+	print FH ("#!/bin/sh\n$jobstring\n");	
+	close(FH);
+	return "$dirname/$jobhash/run.sh";
 }
 
 
