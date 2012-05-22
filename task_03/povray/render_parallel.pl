@@ -58,33 +58,24 @@ foreach my $if (@inputfiles)
 }
 
 
-my $xstep = 0;
-my $ystep = 0;
-my $xrest = 0;
-my $yrest = 0;
-
-$xstep = int($width/$cpus);
-$xrest = $width % $cpus;
-$ystep = int($heigth/$cpus);
-$yrest = $heigth % $cpus;
 
 
 
 sub createjob
 {
-	my ($filename,$startrow,$startcol,$endrow,$endcol,$outputwidth,$outputheigth) = @_;
-	my $jobstring  = "$povray -I$filename -W$outputwidth -H$outputheigth ";
-	$shortfn = basename($filename);
+	my ($jobref,$jobhash) = @_;
+	my $jobstring  = "$povray -I$jobref->{filename} -W$jobref->{outputwidth} -H$jobref->{outputheigth} ";
+	my $shortfn = basename($jobref->{filename});
 	my $dirname = "$outputdir" . "/" . $shortfn;
-	   $jobstring .= "-SR$startrow -SC$startcol -ER$endrow -EC$endcol -O$dirname/";
-	my $jobhash = md5($jobstring);
+	   $jobstring .= "-SR$jobref->{startrow} -SC$jobref->{startcol} -ER$jobref->{endrow} ";
+	   $jobstring .= "-EC$jobref->{endcol} -O$dirname/";
+	
 	mkdir "$dirname/$jobhash";
 	$jobstring .= $jobhash . "/output.tga";
-	
 	open(FH,">$dirname/$jobhash/run.sh") || die "Could not open output file\n"; 
 	print FH ("#!/bin/sh\n$jobstring\n");	
 	close(FH);
-	return "$dirname/$jobhash/run.sh";
+	$jobref->{startscript} = "$dirname/$jobhash/run.sh";
 }
 
 
@@ -98,23 +89,15 @@ sub submit
 
 sub main
 {
-	for ( my $y = 0; $y < $heigth-$yrest; $y+= $ystep )
-	{
-		for ( my $x = 0; $x < $width-$xrest; $x += $xstep )
-		{
-			&render($y,$y+$ystep,$x,$x+$xstep);
-		}
-	}
-	#here be dragons
-	if($xrest != 0)
-	{
+	my $xstep = 0;
+	my $ystep = 0;
+	my $xrest = 0;
+	my $yrest = 0;
 
-		&render(0,$heigth-1,$width-$xrest,$width);
-	}
-	if($yrest != 0)
-	{
-		&render($heigth-$yrest,$heigth,0,$width);
-	}
+	$xstep = int($width/$cpus);
+	$xrest = $width % $cpus;
+	$ystep = int($heigth/$cpus);
+	$yrest = $heigth % $cpus;
 
 }
 
