@@ -59,7 +59,7 @@ sub createjob
 	
 	mkdir "$dirname/$jobhash";
 	$jobstring .= $jobhash . "/output.tga";
-	$jobref->{workingdir} = "./$dirname/$jobhash/";
+	$jobref->{workingdir} = "$dirname/$jobhash/";
 	open(FH,">$jobref->{workingdir}run.sh") || die "Could not open output file $jobref->{workingdir}run.sh\n"; 
 	print FH ("#!/bin/sh\n$jobstring\n");	
 	close(FH);
