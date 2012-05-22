@@ -59,10 +59,11 @@ sub createjob
 	
 	mkdir "$dirname/$jobhash";
 	$jobstring .= $jobhash . "/output.tga";
-	open(FH,">$dirname/$jobhash/run.sh") || die "Could not open output file $dirname/$jobhash/run.sh\n"; 
+	$jobref->{workingdir} = "$dirname/$jobhash/";
+	open(FH,">$jobref->{workingdir}run.sh") || die "Could not open output file $jobref->{workingdir}run.sh\n"; 
 	print FH ("#!/bin/sh\n$jobstring\n");	
 	close(FH);
-	$jobref->{startscript} = "$dirname/$jobhash/run.sh";
+	$jobref->{startscript} = "$jobref->{workingdir}run.sh";
 }
 
 
@@ -70,9 +71,10 @@ sub submit
 {
 	my $job = shift;
 	my $result = "";
+		
 	unless($dry)
 	{
-		$result = qx(qsub $job);
+		$result = qx(qsub -w $job->{workingdir} $job->{startscript});
 		chomp($result);
 	}
 	return $result;
@@ -151,7 +153,7 @@ sub main
 		#actually run the jobs	
 		foreach my $job (keys(%{$pic->{jobs}}))
 		{
-			&submit($pic->{jobs}->{$job}->{startscript});
+			&submit($pic->{jobs}->{$job});
 		}
 	}
 
