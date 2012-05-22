@@ -2,10 +2,12 @@
 use strict;
 use warnings;
 use Getopt::Long;
+use Digest::MD5;
+use File::Basename;
 my $inputfiles = "";
 my $width = 640;
 my $heigth = 480;
-my $outputdir = "";
+my $outputdir = ".";
 my $maxnodes  = 0;
 my $povray = "/usr/bin/povray";
 my $help = 0;
@@ -31,16 +33,17 @@ my $result = GetOptions ("width=i" => \$width,
 
 my @inputfiles = @ARGV;
 
+if ($help or scalar(@inputfiles) == 0)
+{
+	print($usage);
+	exit;
+}
+
 my $cpus = &getCPUNumber();
 if ($maxnodes != 0 and not($maxnodes > $cpus)) {
 	$cpus = $maxnodes;
 }
 
-if ($help)
-{
-	print($usage);
-	exit;
-}
 
 
 my @pics = ();
@@ -49,6 +52,8 @@ my @pics = ();
 foreach my $if (@inputfiles)
 {
 	my %pic = ( filename => $if, jobs => {}); 
+	my $dirname = "$outputdir" . "/" . basename($if);
+	mkdir $dirname;
 	push(@pics,\%pic);
 }
 
@@ -63,6 +68,17 @@ $xrest = $width % $cpus;
 $ystep = int($heigth/$cpus);
 $yrest = $heigth % $cpus;
 
+
+
+sub createjob
+{
+	my ($filename,$startrow,$startcol,$endrow,$endcol,$outputwidth,$outputheigth) = @_;
+	my $jobstring  = "$povray -I$filename -W$outputwidth -H$outputheigth ";
+	   $jobstring .= "-SR$startrow -SC$startcol -ER$endrow -EC$endcol";
+	my $jobid =
+	 
+	
+}
 
 
 sub submit
