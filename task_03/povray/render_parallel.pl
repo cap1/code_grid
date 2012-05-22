@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Getopt::Long;
-use Digest::MD5;
+use Digest::MD5 qw(md5_hex);
 use File::Basename;
 my $inputfiles = "";
 my $width = 640;
@@ -11,6 +11,7 @@ my $outputdir = ".";
 my $maxnodes  = 0;
 my $povray = "/usr/bin/povray";
 my $help = 0;
+my $dry = 0;
 my $usage = <<EOL;
 USAGE:
 	render-parallel [options] inputfile...
@@ -18,6 +19,7 @@ USAGE:
 	--height
 	--outputdir
 	--maxnodes
+	--dry
 	--help 	Display this help
 EOL
 
@@ -26,6 +28,7 @@ EOL
 my $result = GetOptions ("width=i" => \$width, 
 			"height=i" => \$heigth,
 			"ouputdir=s" => \$outputdir,
+			"dry"        => \$dry,
 			"maxnodes=i" => \$maxnodes,
 			"help"       => \$help,
 		     );
@@ -56,7 +59,7 @@ sub createjob
 	
 	mkdir "$dirname/$jobhash";
 	$jobstring .= $jobhash . "/output.tga";
-	open(FH,">$dirname/$jobhash/run.sh") || die "Could not open output file\n"; 
+	open(FH,">$dirname/$jobhash/run.sh") || die "Could not open output file $dirname/$jobhash/run.sh\n"; 
 	print FH ("#!/bin/sh\n$jobstring\n");	
 	close(FH);
 	$jobref->{startscript} = "$dirname/$jobhash/run.sh";
@@ -66,8 +69,12 @@ sub createjob
 sub submit
 {
 	my $job = shift;
-	my $result = qx(qsub $job);
-	chomp($result);
+	my $result = "";
+	unless($dry)
+	{
+		$result = qx(qsub $job);
+		chomp($result);
+	}
 	return $result;
 }
 
@@ -92,6 +99,8 @@ sub main
 		$cpus = $maxnodes;
 	}
 	
+	print("Computing with $cpus nodes\n");
+
 	$xstep = int($width/$cpus);
 	$xrest = $width % $cpus;
 	$ystep = int($heigth/$cpus);
@@ -105,15 +114,15 @@ sub main
 		{
 			for ( my $x = 0; $x < $width; $x+= $xstep )
 			{
-				my $jobhash = md5("$pic->{filename},$x");
+				my $jobhash = md5_hex("$pic->{filename},$x");
 				$pic->{jobs}->{$jobhash}->{filename}     = $pic->{filename};
-				$pic->{jobs}->{$jobhash}->{startrow}     = $0;
+				$pic->{jobs}->{$jobhash}->{startrow}     = 1;
 				$pic->{jobs}->{$jobhash}->{endrow}       = $heigth;
-				$pic->{jobs}->{$jobhash}->{startcol}     = $x;
+				$pic->{jobs}->{$jobhash}->{startcol}     = $x+1;
 				$pic->{jobs}->{$jobhash}->{endcol}       = $x+$xstep;
 				$pic->{jobs}->{$jobhash}->{outputwidth}  = $width;
 				$pic->{jobs}->{$jobhash}->{outputheigth} = $heigth;
-				&createjob($pic->{jobs}->{$jobhash});
+				&createjob($pic->{jobs}->{$jobhash},$jobhash);
 			} 
 
 		}
@@ -127,22 +136,22 @@ sub main
 					$offset=1;
 					$yrest--;
 				}
-				my $jobhash = md5("$pic->{filename},$y");
+				my $jobhash = md5_hex("$pic->{filename},$y");
 				$pic->{jobs}->{$jobhash}->{filename}     = $pic->{filename};
-				$pic->{jobs}->{$jobhash}->{startrow}     = $y;
+				$pic->{jobs}->{$jobhash}->{startrow}     = $y+1;
 				$pic->{jobs}->{$jobhash}->{endrow}       = $y+$ystep+$offset;
-				$pic->{jobs}->{$jobhash}->{startcol}     = 0;
+				$pic->{jobs}->{$jobhash}->{startcol}     = 1;
 				$pic->{jobs}->{$jobhash}->{endcol}       = $width;
 				$pic->{jobs}->{$jobhash}->{outputwidth}  = $width;
 				$pic->{jobs}->{$jobhash}->{outputheigth} = $heigth;
-				&createjob($pic->{jobs}->{$jobhash});
+				&createjob($pic->{jobs}->{$jobhash},$jobhash);
 			}
 		}
 
 		#actually run the jobs	
 		foreach my $job (keys(%{$pic->{jobs}}))
 		{
-			&submit($job->{startscript});
+			&submit($pic->{jobs}->{$job}->{startscript});
 		}
 	}
 
