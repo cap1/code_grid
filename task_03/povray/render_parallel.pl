@@ -39,23 +39,7 @@ if ($help or scalar(@inputfiles) == 0)
 	exit;
 }
 
-my $cpus = &getCPUNumber();
-if ($maxnodes != 0 and not($maxnodes > $cpus)) {
-	$cpus = $maxnodes;
-}
-
-
-
-my @pics = ();
-
-
-foreach my $if (@inputfiles)
-{
-	my %pic = ( filename => $if, jobs => {}); 
-	my $dirname = "$outputdir" . "/" . basename($if);
-	mkdir $dirname;
-	push(@pics,\%pic);
-}
+&main();
 
 
 
@@ -93,11 +77,75 @@ sub main
 	my $ystep = 0;
 	my $xrest = 0;
 	my $yrest = 0;
+	my @pics = ();
 
+	foreach my $if (@inputfiles)
+	{
+		my %pic = ( filename => $if, jobs => {}); 
+		my $dirname = "$outputdir" . "/" . basename($if);
+		mkdir $dirname;
+		push(@pics,\%pic);
+	}
+	
+	my $cpus = &getCPUNumber();
+	if ($maxnodes != 0 and not($maxnodes > $cpus)) {
+		$cpus = $maxnodes;
+	}
+	
 	$xstep = int($width/$cpus);
 	$xrest = $width % $cpus;
 	$ystep = int($heigth/$cpus);
 	$yrest = $heigth % $cpus;
+
+
+	foreach my $pic (@pics)
+	{
+
+		if($xrest == 0)
+		{
+			for ( my $x = 0; $x < $width; $x+= $xstep )
+			{
+				my $jobhash = md5("$pic->{filename},$x");
+				$pic->{jobs}->{$jobhash}->{filename}     = $pic->{filename};
+				$pic->{jobs}->{$jobhash}->{startrow}     = $0;
+				$pic->{jobs}->{$jobhash}->{endrow}       = $heigth;
+				$pic->{jobs}->{$jobhash}->{startcol}     = $x;
+				$pic->{jobs}->{$jobhash}->{endcol}       = $x+$xstep;
+				$pic->{jobs}->{$jobhash}->{outputwidth}  = $width;
+				$pic->{jobs}->{$jobhash}->{outputheigth} = $heigth;
+				&createjob($pic->{jobs}->{$jobhash});
+			} 
+
+		}
+		else
+		{
+			for ( my $y = 0; $y < $heigth; $y+= $ystep )
+			{	
+				my $offset = 0;
+				if($yrest != 0)
+				{	
+					$offset=1;
+					$yrest--;
+				}
+				my $jobhash = md5("$pic->{filename},$y");
+				$pic->{jobs}->{$jobhash}->{filename}     = $pic->{filename};
+				$pic->{jobs}->{$jobhash}->{startrow}     = $y;
+				$pic->{jobs}->{$jobhash}->{endrow}       = $y+$ystep+$offset;
+				$pic->{jobs}->{$jobhash}->{startcol}     = 0;
+				$pic->{jobs}->{$jobhash}->{endcol}       = $width;
+				$pic->{jobs}->{$jobhash}->{outputwidth}  = $width;
+				$pic->{jobs}->{$jobhash}->{outputheigth} = $heigth;
+				&createjob($pic->{jobs}->{$jobhash});
+			}
+		}
+
+		#actually run the jobs	
+		foreach my $job (keys(%{$pic->{jobs}}))
+		{
+			&submit($job->{startscript});
+		}
+	}
+
 
 }
 
