@@ -75,7 +75,7 @@ sub submit
 	unless($dry)
 	{
 		chdir($job->{workingdir});
-		$result = qx(qsub $job->{startscript});
+		$result = qx(qsub run.sh);
 		chomp($result);
 		chdir("./../..");
 	}
