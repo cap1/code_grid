@@ -5,6 +5,7 @@ use Getopt::Long;
 use Digest::MD5 qw(md5_hex);
 use File::Basename;
 use File::Copy;
+use File::Path qw(rmtree);
 use Cwd;
 
 my $inputfiles = "";
@@ -114,7 +115,7 @@ sub main
 	foreach my $pic (@pics)
 	{
 
-		for ( my $y = 0; $y < $heigth; $y+= $ystep )
+		for ( my $y = 0; $y < $heigth-$ystep; $y+= $ystep )
 		{	
 			my $offset = 0;
 			if($yrest != 0)
@@ -143,12 +144,12 @@ sub main
 	}
 
 	my @mergedpics = ();
-	while(scalar(@mergedpics != scalar(@pics)))
+	while(scalar(@mergedpics) != scalar(@pics))
 	{
+		print("=======================================================\n");
 		foreach my $pic (@pics)
 		{
 			my $piccompleted = 1;
-			print("=======================================================\n");
 			foreach my $job (keys(%{$pic->{jobs}}))
 			{
 				if( ! -e "$pic->{jobs}->{$job}->{workingdir}/done" )
@@ -162,6 +163,7 @@ sub main
 				&mergepic($pic);
 				push(@mergedpics,$pic->{filename});
 				print("Merging pic $pic->{filename}\n");
+				&cleanup($pic);
 			}
 		}
 		sleep 5;
@@ -184,6 +186,15 @@ sub mergepic
 	{
 		qx(tail -c +19 $job/output.tga >> ../$file.tga);
 	}
+	chdir("..");
+}
+
+sub cleanup
+{
+	my $pic = shift;
+	my $file = basename($pic->{filename},(".pov"));
+	#rmtree($file);
+	print "rmtree $file\n";
 }
 
 
