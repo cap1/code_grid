@@ -183,7 +183,8 @@ sub main
 			{
 				foreach my $pendingjob (keys(%pendingjobs))
 				{
-					&restartjob($pic,$pendingjob);
+					$pendingjobs{$pendingjob} = &restartjob($pic,$pendingjob);
+					$starttime = time();
 				}
 			}
 		}
@@ -195,7 +196,12 @@ sub main
 
 sub restartjob
 {
-
+	my ($pic,$job) = @_;
+	qx(qdel $pic->{jobs}->{$job}->{pbsid});
+	my $pbsjobid = &submit($pic->{jobs}->{$job});
+	$pic->{jobs}->{$job}->{pbsid} = $pbsjobid;
+	print "submitted $pbsjobid\n";
+	return $pbsjobid;
 
 }
 
