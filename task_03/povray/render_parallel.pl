@@ -64,7 +64,7 @@ sub createjob
 	$jobstring .= $jobhash . "/output.tga";
 	$jobref->{workingdir} = "$dirname/$jobhash/";
 	open(FH,">$jobref->{workingdir}run.sh") || die "Could not open output file $jobref->{workingdir}run.sh\n"; 
-	print FH ("#!/bin/sh\n$jobstring\n");	
+	print FH ("#!/bin/sh\n$jobstring\necho 42 > $jobref->{workingdir}done");	
 	close(FH);
 	$jobref->{startscript} = "$jobref->{workingdir}run.sh";
 }
@@ -162,8 +162,38 @@ sub main
 		}
 	}
 
+	my @mergedpics = ();
+	while(scalar(@mergedpics != scalar(@pics)))
+	{
+		foreach my $pic (@pics)
+		{
+			my $piccompleted = 1;
+			foreach my $job (keys(%{$pic->{jobs}}))
+			{
+				if( ! -e "$pic->{jobs}->{$job}->{workingdir}/done" )
+				{
+					print("$job not done yet, retrying\n");
+					$piccompleted = 0;
+				}
+			}
+			if($piccompleted)
+			{
+				#mergepic($pic);
+				push(@mergedpics,$pic->{filename});
+				print("Merging pic $pic->{filename}");
+			}
+		}
+		sleep 5;
+	}
+
 
 }
+
+sub mergepic
+{
+	my $job = shift;
+}
+
 
 sub getCPUNumber 
 {
