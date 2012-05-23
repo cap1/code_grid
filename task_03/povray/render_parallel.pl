@@ -4,6 +4,7 @@ use warnings;
 use Getopt::Long;
 use Digest::MD5 qw(md5_hex);
 use File::Basename;
+use File::Copy;
 use Cwd;
 
 my $inputfiles = "";
@@ -53,7 +54,7 @@ if ($help or scalar(@inputfiles) == 0)
 sub createjob
 {
 	my ($jobref,$jobhash) = @_;
-	my $jobstring  = "$povray -I$jobref->{filename} -W$jobref->{outputwidth} -H$jobref->{outputheigth} ";
+	my $jobstring  = "$povray -I$jobref->{filename} +FT -W$jobref->{outputwidth} -H$jobref->{outputheigth} ";
 	my $shortfn = basename($jobref->{filename},(".pov"));
 	my $currentdir = &Cwd::cwd();
 	my $dirname = "$currentdir/$outputdir" . "/" . $shortfn;
@@ -87,9 +88,7 @@ sub submit
 
 sub main
 {
-	my $xstep = 0;
 	my $ystep = 0;
-	my $xrest = 0;
 	my $yrest = 0;
 	my @pics = ();
 
@@ -108,8 +107,6 @@ sub main
 	
 	print("Computing with $cpus nodes\n");
 
-	$xstep = int($width/$cpus);
-	$xrest = $width % $cpus;
 	$ystep = int($heigth/$cpus);
 	$yrest = $heigth % $cpus;
 
@@ -117,42 +114,25 @@ sub main
 	foreach my $pic (@pics)
 	{
 
-		if($xrest == 0)
-		{
-			for ( my $x = 0; $x < $width; $x+= $xstep )
-			{
-				my $jobhash = md5_hex("$pic->{filename},$x");
-				$pic->{jobs}->{$jobhash}->{filename}     = $pic->{filename};
-				$pic->{jobs}->{$jobhash}->{startrow}     = 1;
-				$pic->{jobs}->{$jobhash}->{endrow}       = $heigth;
-				$pic->{jobs}->{$jobhash}->{startcol}     = $x+1;
-				$pic->{jobs}->{$jobhash}->{endcol}       = $x+$xstep;
-				$pic->{jobs}->{$jobhash}->{outputwidth}  = $width;
-				$pic->{jobs}->{$jobhash}->{outputheigth} = $heigth;
-				&createjob($pic->{jobs}->{$jobhash},$jobhash);
-			} 
-
-		}
-		else
-		{
-			for ( my $y = 0; $y < $heigth; $y+= $ystep )
+		for ( my $y = 0; $y < $heigth; $y+= $ystep )
+		{	
+			my $offset = 0;
+			if($yrest != 0)
 			{	
-				my $offset = 0;
-				if($yrest != 0)
-				{	
-					$offset=1;
-					$yrest--;
-				}
-				my $jobhash = md5_hex("$pic->{filename},$y");
-				$pic->{jobs}->{$jobhash}->{filename}     = $pic->{filename};
-				$pic->{jobs}->{$jobhash}->{startrow}     = $y+1;
-				$pic->{jobs}->{$jobhash}->{endrow}       = $y+$ystep+$offset;
-				$pic->{jobs}->{$jobhash}->{startcol}     = 1;
-				$pic->{jobs}->{$jobhash}->{endcol}       = $width;
-				$pic->{jobs}->{$jobhash}->{outputwidth}  = $width;
-				$pic->{jobs}->{$jobhash}->{outputheigth} = $heigth;
-				&createjob($pic->{jobs}->{$jobhash},$jobhash);
+				$offset=1;
+				$yrest--;
 			}
+			#my $jobhash = md5_hex("$pic->{filename},$y");
+			my $bn = basename $pic->{filename},(".pov");
+			my $jobhash = "$bn-$y";
+			$pic->{jobs}->{$jobhash}->{filename}     = $pic->{filename};
+			$pic->{jobs}->{$jobhash}->{startrow}     = $y+1;
+			$pic->{jobs}->{$jobhash}->{endrow}       = $y+$ystep+$offset;
+			$pic->{jobs}->{$jobhash}->{startcol}     = 1;
+			$pic->{jobs}->{$jobhash}->{endcol}       = $width;
+			$pic->{jobs}->{$jobhash}->{outputwidth}  = $width;
+			$pic->{jobs}->{$jobhash}->{outputheigth} = $heigth;
+			&createjob($pic->{jobs}->{$jobhash},$jobhash);
 		}
 
 		#actually run the jobs	
@@ -168,6 +148,7 @@ sub main
 		foreach my $pic (@pics)
 		{
 			my $piccompleted = 1;
+			print("=======================================================\n");
 			foreach my $job (keys(%{$pic->{jobs}}))
 			{
 				if( ! -e "$pic->{jobs}->{$job}->{workingdir}/done" )
@@ -178,9 +159,9 @@ sub main
 			}
 			if($piccompleted)
 			{
-				#mergepic($pic);
+				&mergepic($pic);
 				push(@mergedpics,$pic->{filename});
-				print("Merging pic $pic->{filename}");
+				print("Merging pic $pic->{filename}\n");
 			}
 		}
 		sleep 5;
@@ -191,7 +172,18 @@ sub main
 
 sub mergepic
 {
-	my $job = shift;
+	my $pic = shift;
+	#my $firsthash = md5_hex("$pic->{filename},0");
+	
+	my $file = basename($pic->{filename},(".pov"));
+	chdir($file);
+	my @filelist = sort { substr($a,length("$file-")) <=> substr($b,length("$file-")) } (keys(%{$pic->{jobs}}));
+	
+	copy(shift(@filelist)."/output.tga","../$file.tga");
+	foreach my $job (@filelist)
+	{
+		qx(tail -c +19 $job/output.tga >> ../$file.tga);
+	}
 }
 
 
