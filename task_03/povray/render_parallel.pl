@@ -147,7 +147,7 @@ sub main
 
 	my @mergedpics = ();
 	my $starttime = time();
-	my $threequatertime;
+	my $threequartertime;
 	while(scalar(@mergedpics) != scalar(@pics))
 	{
 		print("=======================================================\n");
@@ -177,14 +177,14 @@ sub main
 			}
 			if ($completecounter > int(scalar(keys(%{$pic->{jobs}})) /0.75))
 			{
-				$threequatertime = time();
-			}
-			if ( ($threequatertime-$starttime)**2 > time()-$starttime)
-			{
-				foreach my $pendingjob (keys(%pendingjobs))
+				$threequartertime = time();
+				if ( ($threequartertime-$starttime)**2 > time()-$starttime)
 				{
-					$pendingjobs{$pendingjob} = &restartjob($pic,$pendingjob);
-					$starttime = time();
+					foreach my $pendingjob (keys(%pendingjobs))
+					{
+						$pendingjobs{$pendingjob} = &restartjob($pic,$pendingjob);
+						$starttime = time();
+					}
 				}
 			}
 		}
