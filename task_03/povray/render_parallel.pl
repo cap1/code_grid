@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Getopt::Long;
-use Digest::MD5 qw(md5_hex);
 use File::Basename;
 use File::Copy;
 use File::Path qw(rmtree);
@@ -20,7 +19,7 @@ my $usage = <<EOL;
 USAGE:
 	render-parallel [options] inputfile...
 	--width
-	--height
+	--heigth
 	--outputdir
 	--maxnodes
 	--dry
@@ -30,7 +29,7 @@ EOL
 
 
 my $result = GetOptions ("width=i" => \$width, 
-			"height=i" => \$heigth,
+			"heigth=i" => \$heigth,
 			"ouputdir=s" => \$outputdir,
 			"dry"        => \$dry,
 			"maxnodes=i" => \$maxnodes,
@@ -55,7 +54,7 @@ if ($help or scalar(@inputfiles) == 0)
 sub createjob
 {
 	my ($jobref,$jobhash) = @_;
-	my $jobstring  = "$povray -I$jobref->{filename} +FT -W$jobref->{outputwidth} -H$jobref->{outputheigth} ";
+	my $jobstring  = "$povray -I$jobref->{filename} +FT +WL0 -W$jobref->{outputwidth} -H$jobref->{outputheigth} ";
 	my $shortfn = basename($jobref->{filename},(".pov"));
 	my $currentdir = &Cwd::cwd();
 	my $dirname = "$currentdir/$outputdir" . "/" . $shortfn;
@@ -92,6 +91,7 @@ sub main
 	my $ystep = 0;
 	my $yrest = 0;
 	my @pics = ();
+	my %pendingjobs = ();
 
 	foreach my $if (@inputfiles)
 	{
@@ -123,7 +123,6 @@ sub main
 				$offset=1;
 				$yrest--;
 			}
-			#my $jobhash = md5_hex("$pic->{filename},$y");
 			my $bn = basename $pic->{filename},(".pov");
 			my $jobhash = "$bn-$y";
 			$pic->{jobs}->{$jobhash}->{filename}     = $pic->{filename};
@@ -139,23 +138,34 @@ sub main
 		#actually run the jobs	
 		foreach my $job (keys(%{$pic->{jobs}}))
 		{
-			&submit($pic->{jobs}->{$job});
+			my $pbsjobid = &submit($pic->{jobs}->{$job});
+			$pic->{jobs}->{$job}->{pbsid} = $pbsjobid;
+			$pendingjobs{$job} = $pbsjobid;
+			print "submitted $pbsjobid\n";
 		}
 	}
 
 	my @mergedpics = ();
+	my $starttime = time();
+	my $threequatertime;
 	while(scalar(@mergedpics) != scalar(@pics))
 	{
 		print("=======================================================\n");
 		foreach my $pic (@pics)
 		{
 			my $piccompleted = 1;
+			my $completecounter = 0;
 			foreach my $job (keys(%{$pic->{jobs}}))
 			{
 				if( ! -e "$pic->{jobs}->{$job}->{workingdir}/done" )
 				{
 					print("$job not done yet, retrying\n");
 					$piccompleted = 0;
+				}
+				else 
+				{
+					delete $pendingjobs{$job};	
+					$completecounter++;
 				}
 			}
 			if($piccompleted)
@@ -165,6 +175,17 @@ sub main
 				print("Merging pic $pic->{filename}\n");
 				&cleanup($pic);
 			}
+			if ($completecounter > int(scalar(keys(%{$pic->{jobs}})) /0.75))
+			{
+				$threequatertime = time();
+			}
+			if ( ($threequatertime-$starttime)**2 > time()-$starttime)
+			{
+				foreach my $pendingjob (keys(%pendingjobs))
+				{
+					&restartjob($pic,$pendingjob);
+				}
+			}
 		}
 		sleep 5;
 	}
@@ -172,11 +193,15 @@ sub main
 
 }
 
+sub restartjob
+{
+
+
+}
+
 sub mergepic
 {
 	my $pic = shift;
-	#my $firsthash = md5_hex("$pic->{filename},0");
-	
 	my $file = basename($pic->{filename},(".pov"));
 	chdir($file);
 	my @filelist = sort { substr($a,length("$file-")) <=> substr($b,length("$file-")) } (keys(%{$pic->{jobs}}));
@@ -193,7 +218,7 @@ sub cleanup
 {
 	my $pic = shift;
 	my $file = basename($pic->{filename},(".pov"));
-	#rmtree($file);
+#	rmtree($file);
 	print "rmtree $file\n";
 }
 
