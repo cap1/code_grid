@@ -4,6 +4,8 @@ use warnings;
 use Getopt::Long;
 use Digest::MD5 qw(md5_hex);
 use File::Basename;
+use Cwd;
+
 my $inputfiles = "";
 my $width = 640;
 my $heigth = 480;
@@ -52,10 +54,11 @@ sub createjob
 {
 	my ($jobref,$jobhash) = @_;
 	my $jobstring  = "$povray -I$jobref->{filename} -W$jobref->{outputwidth} -H$jobref->{outputheigth} ";
-	my $shortfn = basename($jobref->{filename});
-	my $dirname = "$outputdir" . "/" . $shortfn;
+	my $shortfn = basename($jobref->{filename},(".pov"));
+	my $currentdir = &Cwd::cwd();
+	my $dirname = "$currentdir/$outputdir" . "/" . $shortfn;
 	   $jobstring .= "-SR$jobref->{startrow} -SC$jobref->{startcol} -ER$jobref->{endrow} ";
-	   $jobstring .= "-EC$jobref->{endcol} -O$dirname/";
+	   $jobstring .= "-EC$jobref->{endcol} +O$dirname/";
 	
 	mkdir "$dirname/$jobhash";
 	$jobstring .= $jobhash . "/output.tga";
@@ -93,7 +96,7 @@ sub main
 	foreach my $if (@inputfiles)
 	{
 		my %pic = ( filename => $if, jobs => {}); 
-		my $dirname = "$outputdir" . "/" . basename($if);
+		my $dirname = "$outputdir" . "/" . basename($if,(".pov"));
 		mkdir $dirname;
 		push(@pics,\%pic);
 	}
