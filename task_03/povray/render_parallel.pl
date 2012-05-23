@@ -175,8 +175,9 @@ sub main
 				print("Merging pic $pic->{filename}\n");
 				&cleanup($pic);
 			}
-			if ($completecounter > int(scalar(keys(%{$pic->{jobs}})) /0.75))
+			if ($completecounter > int(scalar(keys(%{$pic->{jobs}})) /0.42))
 			{
+				print "--completed 3/4 of Jobs\n";
 				$threequartertime = time();
 				if ( ($threequartertime-$starttime)**2 > time()-$starttime)
 				{
@@ -184,23 +185,33 @@ sub main
 					{
 						$pendingjobs{$pendingjob} = &restartjob($pic,$pendingjob);
 						$starttime = time();
+						
 					}
 				}
+			}
+			if (&quotareached)
+			{
+				print "Not enough Disk Space - Holding all Jobs\n";
 			}
 		}
 		sleep 5;
 	}
+}
 
-
+sub quotareached
+{
+	return 0;
 }
 
 sub restartjob
 {
 	my ($pic,$job) = @_;
+
+	print "restarting job $job";
 	qx(qdel $pic->{jobs}->{$job}->{pbsid});
 	my $pbsjobid = &submit($pic->{jobs}->{$job});
 	$pic->{jobs}->{$job}->{pbsid} = $pbsjobid;
-	print "submitted $pbsjobid\n";
+	print "with $pbsjobid\n";
 	return $pbsjobid;
 
 }
