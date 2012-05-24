@@ -191,7 +191,7 @@ sub main
 			}
 			if (&quotareached)
 			{
-				my $userinput;
+				my $userinput = "";
 				do
 				{
 					print "Not enough Disk Space - Holding all Jobs[h] or delete everything[d]?\n";
@@ -211,6 +211,29 @@ sub main
 					}
 					exit;
 				}
+				elsif ($userinput eq "h") 
+				{
+					foreach my $pendingjob (keys(%pendingjobs)) 
+					{
+						print "Holding Job $pendingjobs{$pendingjob}\n";
+						qx(qhold $pendingjobs{$pendingjob});
+					}
+
+					my $userinput = "";
+					do
+					{
+						print "Free Disk Storage, then enter [c]\n";
+						$userinput = <STDIN>;
+						chomp($userinput);
+					} until (not(&quotareaced) and $userinput eq "c");
+
+					foreach my $pendingjob (keys(%pendingjobs)) 
+					{
+						print "Releasing Job $pendingjobs{$pendingjob}\n";
+						qx(qrls $pendingjobs{$pendingjob});
+					}
+				}
+					
 			}
 		}
 		sleep 5;
