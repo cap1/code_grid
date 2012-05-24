@@ -45,6 +45,15 @@ if ($help or scalar(@inputfiles) == 0)
 	exit;
 }
 
+foreach (my $i = 0; $i < scalar(@inputfiles); $i++)
+{
+	if (-e $inputfiles[$i])
+	{
+		splice(@inputfiles, $i, 1);				
+		print("skipping " . $inputfiles[$i] . " as it doesnt exists.\n");
+	}
+}
+
 &main();
 
 
