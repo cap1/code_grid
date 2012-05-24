@@ -191,7 +191,26 @@ sub main
 			}
 			if (&quotareached)
 			{
-				print "Not enough Disk Space - Holding all Jobs\n";
+				my $userinput;
+				do
+				{
+					print "Not enough Disk Space - Holding all Jobs[h] or delete everything[d]?\n";
+					$userinput = <STDIN>;
+					chomp($userinput);
+				} until ($userinput eq "h" or $userinput eq "d");
+
+				if ($userinput eq "d")
+				{
+					foreach my $pic (keys(%{$pic})) 
+					{
+						foreach my $job (keys(%{$pic->{jobs}}))
+						{
+							qx(qdel $pic->{jobs}->{$job}->{pbsid});
+						}
+						&cleanup($pic);
+					}
+					exit;
+				}
 			}
 		}
 		sleep 5;
