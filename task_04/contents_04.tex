@@ -20,7 +20,7 @@
 
 \subsection{Performanz}
 
-		In Tabelle \ref{tab:povrayperformance} lässt sich der zeitliche Vorteil	gut erkennen. 
+In Tabelle \ref{tab:povrayperformance}  und Abbildung \ref{fig:povrayperfplot} lässt sich der zeitliche Vorteil gut erkennen. 
 		So wird deutlich, das durch Verwendung des mehrer Knoten ein Overhead ensteht,
 		welcher bis zu einer Bildgröße von etwa 500*500 Pixel erkennbar ist.
 		Werden die Bilder größer ist der verteilte Ansatz schneller.
@@ -48,4 +48,12 @@
 	
 		Zu beachten ist das durch das Warten auf den Abschluss der Jobs Verzerrungen aufgetreten seien können,
 		da nur all 5 Sekunden überprüft wird ob die Jobs abgeschlossen sind.
+
+		\begin{figure}[h]
+			\begin{center}
+				\includegraphics[trim=2cm 14cm 4cm 3cm,clip]{./task_03/plot}
+			\end{center}
+			\caption{Plot der Performanzauswertung.}
+			\label{fig:povrayperfplot}
+		\end{figure}
 	
