@@ -45,6 +45,15 @@ if ($help or scalar(@inputfiles) == 0)
 	exit;
 }
 
+foreach (my $i = 0; $i < scalar(@inputfiles); $i++)
+{
+	if (-e $inputfiles[$i])
+	{
+		splice(@inputfiles, $i, 1);				
+		print("skipping " . $inputfiles[$i] . " as it doesnt exists.\n");
+	}
+}
+
 &main();
 
 
@@ -191,7 +200,49 @@ sub main
 			}
 			if (&quotareached)
 			{
-				print "Not enough Disk Space - Holding all Jobs\n";
+				my $userinput = "";
+				do
+				{
+					print "Not enough Disk Space - Holding all Jobs[h] or delete everything[d]?\n";
+					$userinput = <STDIN>;
+					chomp($userinput);
+				} until ($userinput eq "h" or $userinput eq "d");
+
+				if ($userinput eq "d")
+				{
+					foreach my $pic (keys(%{$pic})) 
+					{
+						foreach my $job (keys(%{$pic->{jobs}}))
+						{
+							qx(qdel $pic->{jobs}->{$job}->{pbsid});
+						}
+						&cleanup($pic);
+					}
+					exit;
+				}
+				elsif ($userinput eq "h") 
+				{
+					foreach my $pendingjob (keys(%pendingjobs)) 
+					{
+						print "Holding Job $pendingjobs{$pendingjob}\n";
+						qx(qhold $pendingjobs{$pendingjob});
+					}
+
+					my $userinput = "";
+					do
+					{
+						print "Free Disk Storage, then enter [c]\n";
+						$userinput = <STDIN>;
+						chomp($userinput);
+					} until (not(&quotareaced) and $userinput eq "c");
+
+					foreach my $pendingjob (keys(%pendingjobs)) 
+					{
+						print "Releasing Job $pendingjobs{$pendingjob}\n";
+						qx(qrls $pendingjobs{$pendingjob});
+					}
+				}
+					
 			}
 		}
 		sleep 5;
