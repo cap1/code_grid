@@ -2,9 +2,9 @@
 use strict;
 use warnings;
 use Getopt::Long;
-use Digest::MD5 qw(md5_hex);
 use File::Basename;
 use File::Copy;
+use File::Path qw(rmtree);
 use Cwd;
 
 my $inputfiles = "";
@@ -19,7 +19,7 @@ my $usage = <<EOL;
 USAGE:
 	render-parallel [options] inputfile...
 	--width
-	--height
+	--heigth
 	--outputdir
 	--maxnodes
 	--dry
@@ -29,7 +29,7 @@ EOL
 
 
 my $result = GetOptions ("width=i" => \$width, 
-			"height=i" => \$heigth,
+			"heigth=i" => \$heigth,
 			"ouputdir=s" => \$outputdir,
 			"dry"        => \$dry,
 			"maxnodes=i" => \$maxnodes,
@@ -54,7 +54,7 @@ if ($help or scalar(@inputfiles) == 0)
 sub createjob
 {
 	my ($jobref,$jobhash) = @_;
-	my $jobstring  = "$povray -I$jobref->{filename} +FT -W$jobref->{outputwidth} -H$jobref->{outputheigth} ";
+	my $jobstring  = "$povray -I$jobref->{filename} +FT +WL0 -W$jobref->{outputwidth} -H$jobref->{outputheigth} ";
 	my $shortfn = basename($jobref->{filename},(".pov"));
 	my $currentdir = &Cwd::cwd();
 	my $dirname = "$currentdir/$outputdir" . "/" . $shortfn;
@@ -91,6 +91,7 @@ sub main
 	my $ystep = 0;
 	my $yrest = 0;
 	my @pics = ();
+	my %pendingjobs = ();
 
 	foreach my $if (@inputfiles)
 	{
@@ -114,7 +115,7 @@ sub main
 	foreach my $pic (@pics)
 	{
 
-		for ( my $y = 0; $y < $heigth; $y+= $ystep )
+		for ( my $y = 0; $y < $heigth-$ystep; $y+= $ystep )
 		{	
 			my $offset = 0;
 			if($yrest != 0)
@@ -122,7 +123,6 @@ sub main
 				$offset=1;
 				$yrest--;
 			}
-			#my $jobhash = md5_hex("$pic->{filename},$y");
 			my $bn = basename $pic->{filename},(".pov");
 			my $jobhash = "$bn-$y";
 			$pic->{jobs}->{$jobhash}->{filename}     = $pic->{filename};
@@ -138,17 +138,23 @@ sub main
 		#actually run the jobs	
 		foreach my $job (keys(%{$pic->{jobs}}))
 		{
-			&submit($pic->{jobs}->{$job});
+			my $pbsjobid = &submit($pic->{jobs}->{$job});
+			$pic->{jobs}->{$job}->{pbsid} = $pbsjobid;
+			$pendingjobs{$job} = $pbsjobid;
+			print "submitted $pbsjobid\n";
 		}
 	}
 
 	my @mergedpics = ();
-	while(scalar(@mergedpics != scalar(@pics)))
+	my $starttime = time();
+	my $threequartertime;
+	while(scalar(@mergedpics) != scalar(@pics))
 	{
+		print("=======================================================\n");
 		foreach my $pic (@pics)
 		{
 			my $piccompleted = 1;
-			print("=======================================================\n");
+			my $completecounter = 0;
 			foreach my $job (keys(%{$pic->{jobs}}))
 			{
 				if( ! -e "$pic->{jobs}->{$job}->{workingdir}/done" )
@@ -156,25 +162,63 @@ sub main
 					print("$job not done yet, retrying\n");
 					$piccompleted = 0;
 				}
+				else 
+				{
+					delete $pendingjobs{$job};	
+					$completecounter++;
+				}
 			}
 			if($piccompleted)
 			{
 				&mergepic($pic);
 				push(@mergedpics,$pic->{filename});
 				print("Merging pic $pic->{filename}\n");
+				&cleanup($pic);
+			}
+			if ($completecounter > int(scalar(keys(%{$pic->{jobs}})) /0.42))
+			{
+				print "--completed 3/4 of Jobs\n";
+				$threequartertime = time();
+				if ( ($threequartertime-$starttime)**2 > time()-$starttime)
+				{
+					foreach my $pendingjob (keys(%pendingjobs))
+					{
+						$pendingjobs{$pendingjob} = &restartjob($pic,$pendingjob);
+						$starttime = time();
+						
+					}
+				}
+			}
+			if (&quotareached)
+			{
+				print "Not enough Disk Space - Holding all Jobs\n";
 			}
 		}
 		sleep 5;
 	}
+}
 
+sub quotareached
+{
+	return 0;
+}
+
+sub restartjob
+{
+	my ($pic,$job) = @_;
+
+	print "restarting job $job";
+	qx(qdel $pic->{jobs}->{$job}->{pbsid});
+	my $pbsjobid = &submit($pic->{jobs}->{$job});
+	$pic->{jobs}->{$job}->{pbsid} = $pbsjobid;
+	print "with $pbsjobid\n";
+	return $pbsjobid;
 
 }
 
 sub mergepic
 {
 	my $pic = shift;
-	#my $firsthash = md5_hex("$pic->{filename},0");
-	
 	my $file = basename($pic->{filename},(".pov"));
 	chdir($file);
 	my @filelist = sort { substr($a,length("$file-")) <=> substr($b,length("$file-")) } (keys(%{$pic->{jobs}}));
@@ -184,6 +228,15 @@ sub mergepic
 	{
 		qx(tail -c +19 $job/output.tga >> ../$file.tga);
 	}
+	chdir("..");
+}
+
+sub cleanup
+{
+	my $pic = shift;
+	my $file = basename($pic->{filename},(".pov"));
+#	rmtree($file);
+	print "rmtree $file\n";
 }
 
 
