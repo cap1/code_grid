@@ -156,7 +156,7 @@ sub main
 
 	my @mergedpics = ();
 	my $starttime = time();
-	my $threequartertime;
+	my $thresholdtime;
 	while(scalar(@mergedpics) != scalar(@pics))
 	{
 		print("=======================================================\n");
@@ -186,10 +186,11 @@ sub main
 			}
 			if ($completecounter > int(scalar(keys(%{$pic->{jobs}})) /0.42))
 			{
-				print "--completed 3/4 of Jobs\n";
-				$threequartertime = time();
-				if ( ($threequartertime-$starttime)**2 > time()-$starttime)
+				print "--completed 42% of Jobs\n";
+				$thresholdtime = time()-$starttime;
+				if ( ($thresholdtime)*1.5 > time()-$starttime)
 				{
+					print("Reached thresholdtime, resubmitting jobs\n");
 					foreach my $pendingjob (keys(%pendingjobs))
 					{
 						$pendingjobs{$pendingjob} = &restartjob($pic,$pendingjob);
@@ -286,7 +287,7 @@ sub cleanup
 {
 	my $pic = shift;
 	my $file = basename($pic->{filename},(".pov"));
-#	rmtree($file);
+	rmtree($file);
 	print "rmtree $file\n";
 }
 
