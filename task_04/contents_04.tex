@@ -1,5 +1,30 @@
 \section{Aufgabenblatt 4}
 
-\subsection{Aufgabe 2 Error Handling}
+\subsection{Error Handling}
+	Eigentlich sollte sich PBS darum kümmern Jobs zu verschieben und 
+	neuzustarten, wenn ein Knoten abstürzt auf dem ein Job lief.
 
 
+\subsection{Performanz}
+
+		\begin{table}[h!]
+		\begin{center}
+		\begin{tabular}{r l l l} 
+			\toprule
+			Bildgröße	&	1 Knoten		&	10 Knoten	&	20 Knoten	\\
+			\midrule
+
+			100	&	1.691		&	35.773	&	37.141	\\
+			200	&	4.943		&	36.063	&	36.91	\\
+			300	&	10.232	&	36.207	&	37.264	\\
+			500	&	27.197	&	36.31		&	37.004	\\
+			1000	&	106.417	&	36.174	&	37.215	\\
+			2000	&	449.276	&	121.691	&	72.73	\\
+			4000	&	1700.454	&	404.263	&	228.201	\\
+			\bottomrule
+
+		\end{tabular}
+		\caption{Übersicht über die Laufzeiten von Povray bei Verwendung mehrere Knoten in Sekunden.}
+		\label{tab:povrayperformance}
+		\end{center}
+		\end{table}
