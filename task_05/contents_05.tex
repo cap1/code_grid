@@ -2,14 +2,25 @@
 \subsection{Cluster und Grid Computing}
 
 	\subsubsection*{Zusammenhänge von Grid und Cluster Systemen}
-		\begin{description}
-			\item[Virtual Organization]\hfill \\
-			\item[Grid Site]\hfill \\
-			\item[Cluster Management, Cluster Clients]\hfill \\
-			\item[Grid Server, Grid Clients]\hfill \\
-			\item[Information Service]\hfill \\
-			\item[Meta-Scheduler]\hfill \\
-		\end{description}
+	{\scriptsize Stichpunkte: \textsl{Virtual Organization, Grid Site, Cluster Management, Cluster Clients, Grid Server, Grid Clients, Information Service, Meta-Scheduler} } \\
+	
+		Grid Systeme sind lose Zusammenschlüsse von Computersystemen.
+		Sie sind meist noch heterogener zusammengesetzt als Cluster Systeme.
+		Grid werden von Virtuellen Organisationen verwendet.
+		Sie gruppieren Gruppen von Benutzer nach definierten Eingenschaften
+		und legen der Zugriffsrechte innerhalb des Grids fest.
+		Die Verwaltung von Grid-Systemen erfolgt über eine Grid Middleware,
+		welche der verbindende Punkt zwischen den einzelnen Grid Sites ist.
+		
+		Cluster können teile von Grids sein.
+		Die Cluster werden dann zu Grid-Clients,
+		welche durch den Meta-Scheduler des Grids Jobs zugewiesen bekommen.
+		Die Jobs werden dann im Cluster auf die einzelnen Nodes verteilt.
+		
+		Das Grid-System wir durch den Information Service zusammengehalten.
+		Es ermöglicht den Zugriff auf wichtige Daten des Gridsystems.
+		Beispielsweise, welche Daten in welcher Gridsite lokal vorhanden sind,
+		oder wie stark eine Ressource ausgelastet ist, bzw. verfügbar ist.
 
 	\subsubsection*{Was ist ein Meta-Schedulder?}
 		%ws-gram
