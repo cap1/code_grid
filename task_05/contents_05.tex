@@ -47,8 +47,28 @@
 		um Jobs zu starten.
 
 \subsection{Zertifikate und Proxy}
-	\subsubsection{Wie werden Zertifikate verwendet?}
+	\subsubsection{Wofür werden Zertifikate im Grid eingesetzt?\\
+	Wie sieht der Prozess von Beantragung \& Ausstellung aus?}
+		Zur Identifikation von Entitäten (Hosts, Dienste, Nutzer, usw.) 
+		und für verschlüsselte Kommunikation im Grid.
+		Die X.509 Zertifikate werden von Zertifizierungsstellen (CA) signiert.
+		Besitzer eines signierten Zertifikates können kurzlebige Proxy-Zertifikate erstellen,
+		um ihre Rechte weiterzugeben.
+		
 	\subsubsection{Zusammenhang: Grid-Zertifikat, -Credentials, -Proxy, Credentials Delegation und öffentlicher Schlüssel}
+		Ein Grid-Zertifikat besteht aus einem öffentlichen und einem privaten Teil.
+		Analog zur asymmetrischen Verschlüsselung,
+		kann mit dem privaten Schlüssel etwas signiert werden.
+		Mit dem öffentlichen Schlüssel lässt sich die Signatur überprüfen.
+		Da der private Schlüssel nur dem Besitzer des Zertifikates bekannt ist,
+		können von ihm erstellte Proxy-Zertifikate auf ihre Gültigkeit überprüft werden.
+		
+		Auf die zeitlich beschränkten Proxy-Zertifikat gehen Zugriffsrechte des Ausstellenden Nutzers über,
+		was als Credentials-Delegation bezeichnet wird.
+		Mit Hilfe der Proxy-Zertifikate können Dienste und Jobs agieren
+		als wären sie der Ausstellende Nutzer
+		Anhand des öffentlichen Schlüssels des Nutzer kann die Authentizität 
+		der Zertifikate und die Nutzerzuordnung erfolgen.
 
 	\subsubsection{Prüfen von Grid-Zertifikaten}
 	\subsubsection{Prüfen von Grid-Proxy-Zertifikaten}
