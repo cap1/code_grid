@@ -154,6 +154,11 @@
 		IndexServiceEntry}.
 
 	\subsubsection{Verfügbarkeit von Rssourcen in der Grid-Umgebeung}
+		In der Textdatei \texttt{/usr/bin/machines} stehen die Namen der verfügbaren Rechner.
+		Sie wird alle 30 Sekunden aktualisiert.\\
+		Mit dem Befehl \texttt{globus-job-run bombay /bin/hostname -f} lässt sich ein Job auf der 
+		Ressource \glqq bombay\grqq{} starten. Der Befehl im obrigen Beispiel ist \texttt{/bin/hostname -f}.
+		
 	\subsubsection{Datenverfügbarkeit in der Grid-Umgebung}
 	% $> globus-url-copy && rft
 
