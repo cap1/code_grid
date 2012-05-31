@@ -1,0 +1,89 @@
+\section{Aufgabenblatt 5}
+\subsection{Cluster und Grid Computing}
+
+	\subsubsection{Zusammenhänge von Grid und Cluster Systemen}
+	{\scriptsize Stichpunkte: \textsl{Virtual Organization, Grid Site, Cluster Management, Cluster Clients, Grid Server, Grid Clients, Information Service, Meta-Scheduler} } \\
+	
+		Grid Systeme sind lose Zusammenschlüsse von Computersystemen.
+		Sie sind meist noch heterogener zusammengesetzt als Cluster Systeme.
+		Grid werden von Virtuellen Organisationen verwendet.
+		Sie gruppieren Gruppen von Benutzer nach definierten Eingenschaften
+		und legen der Zugriffsrechte innerhalb des Grids fest.
+		Die Verwaltung von Grid-Systemen erfolgt über eine Grid Middleware,
+		welche der verbindende Punkt zwischen den einzelnen Grid Sites ist.
+		
+		Cluster können teile von Grids sein.
+		Die Cluster werden dann zu Grid-Clients,
+		welche durch den Meta-Scheduler des Grids Jobs zugewiesen bekommen.
+		Die Jobs werden dann im Cluster auf die einzelnen Nodes verteilt.
+		
+		Das Grid-System wir durch den Information Service zusammengehalten.
+		Es ermöglicht den Zugriff auf wichtige Daten des Gridsystems.
+		Beispielsweise, welche Daten in welcher Gridsite lokal vorhanden sind,
+		oder wie stark eine Ressource ausgelastet ist, bzw. verfügbar ist.
+
+	\subsubsection{Was ist ein Meta-Scheduler?}
+		\label{sec:metascheduler}
+		Ein Meta-Scheduler vereint alle Scheduler eines Grids und
+		verteilt die Jobs an den jeweils optimalen Standort.
+		%ws-gram
+		
+	\subsubsection{Wozu benötigt man den Information Service?}
+		Er stellt Informationen über die Bestandteile eines Grids zur Verfügung.
+		Durch die geographische Verteilung der Grid-Ressourcen ist es nötig,
+		automatisch maschinenlesbare Informationen über die Grid-Ressourcen zu erhalten.
+		Insbesondere der Meta-Scheduler (\ref{sec:metascheduler}) ist darauf angewiesen.
+
+		Im Globus Toolkit übernimmt der \textsl{Monitoring and Discovery Service} diese 
+		Aufgabe.
+		
+	\subsubsection{Vorteile von Grid gegenüber Clustersystemen}
+		Grid Systeme sind meist größer als einzelne Cluster.
+		Abhängig von der Größe des Jobs und des Entstehenden Overheads
+		durch Verwendung des Grids,
+		muss abgewogen bzw. abgeschätzt werden wo der Job schneller beendet wird.
+		Bei der Verwendung des Grids muss in Betracht gezogen werden,
+		dass möglicher Weise große Datenmengen transportiert werden müssen
+		um Jobs zu starten.
+
+\subsection{Zertifikate und Proxy}
+	\subsubsection{Wofür werden Zertifikate im Grid eingesetzt?\\
+	Wie sieht der Prozess von Beantragung \& Ausstellung aus?}
+		Zur Identifikation von Entitäten (Hosts, Dienste, Nutzer, usw.) 
+		und für verschlüsselte Kommunikation im Grid.
+		Die X.509 Zertifikate werden von Zertifizierungsstellen (CA) signiert.
+		Besitzer eines signierten Zertifikates können kurzlebige Proxy-Zertifikate erstellen,
+		um ihre Rechte weiterzugeben.
+		
+	\subsubsection{Zusammenhang: Grid-Zertifikat, -Credentials, -Proxy, Credentials Delegation und öffentlicher Schlüssel}
+		Ein Grid-Zertifikat besteht aus einem öffentlichen und einem privaten Teil.
+		Analog zur asymmetrischen Verschlüsselung,
+		kann mit dem privaten Schlüssel etwas signiert werden.
+		Mit dem öffentlichen Schlüssel lässt sich die Signatur überprüfen.
+		Da der private Schlüssel nur dem Besitzer des Zertifikates bekannt ist,
+		können von ihm erstellte Proxy-Zertifikate auf ihre Gültigkeit überprüft werden.
+		
+		Auf die zeitlich beschränkten Proxy-Zertifikat gehen Zugriffsrechte des Ausstellenden Nutzers über,
+		was als Credentials-Delegation bezeichnet wird.
+		Mit Hilfe der Proxy-Zertifikate können Dienste und Jobs agieren
+		als wären sie der Ausstellende Nutzer
+		Anhand des öffentlichen Schlüssels des Nutzer kann die Authentizität 
+		der Zertifikate und die Nutzerzuordnung erfolgen.
+
+	\subsubsection{Prüfen von Grid-Zertifikaten}
+	\subsubsection{Prüfen von Grid-Proxy-Zertifikaten}
+	\subsubsection{Verändern von Grid-Proxy Zertifikaten}
+
+\subsection{Grid-Umgebung}
+	\subsubsection{Service Container der Grid-Umgebung}
+	\subsubsection{Verfügbarkeit von Rssourcen in der Grid-Umgebeung}
+	\subsubsection{Datenverfügbarkeit in der Grid-Umgebung}
+	% $> globus-url-copy && rft
+
+\subsection{Job Submission mit dem Globus Toolkit}
+	% $>globusrun-ws submit -f job.xml
+	\subsubsection{Unterschied zwischen Fork und PBS Job}
+	\subsubsection{Dokumentieren von Grid-Jobs}
+		% MDS für Monitoring und Discovery
+		% $>wsrf-query
+
