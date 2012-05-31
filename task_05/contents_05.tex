@@ -99,59 +99,45 @@
 
 \subsection{Grid-Umgebung}
 	\subsubsection{Service Container der Grid-Umgebung}
-	
-	Im Container laufen folgende Dienste:
-	\textsl{AdminService,
-		AuthzCalloutTestService,
-		CASService,
-		ContainerRegistryEntryService,
-		ContainerRegistryService,
-		CounterService,
-		DefaultIndexService,
-		DefaultIndexServiceEntry,
-		DefaultTriggerService,
-		DefaultTriggerServiceEntry,
-		DelegationFactoryService,
-		DelegationService,
-		DelegationTestService,
-		InMemoryServiceGroup,
-		InMemoryServiceGroupEntry,
-		InMemoryServiceGroupFactory,
-		IndexFactoryService,
-		IndexService,
-		IndexServiceEntry,
-		ManagedExecutableJobService,
-		ManagedJobFactoryService,
-		ManagedMultiJobService,
-		ManagementService,
-		NotificationConsumerFactoryService,
-		NotificationConsumerService,
-		NotificationTestService,
-		PersistenceTestSubscriptionManager,
-		ReliableFileTransferFactoryService,
-		ReliableFileTransferService,
-		RendezvousFactoryService,
-		SampleAuthzService,
-		SecureCounterService,
-		SecurityTestService,
-		ShutdownService,
-		SubscriptionManagerService,
-		TestAuthzService,
-		TestRPCService,
-		TestService,
-		TestServiceRequest,
-		TestServiceWrongWSDL,
-		TriggerFactoryService,
-		TriggerService,
-		TriggerServiceEntry,
-		Version,
-		WidgetNotificationService,
-		WidgetService,
-		AuthenticationService,
-		IndexService,
-		IndexServiceEntry,
-		IndexService,
-		IndexServiceEntry}.
+		Im Container laufen die in Tabelle \ref{tab:containerServices} aufgeführten Dienste.
+		\begin{table}[ht!]
+			\begin{center}
+			\begin{tabular}{l l} 
+			\toprule
+			\multicolumn{2}{ c }{Dienste}	\\
+			\midrule
+				AuthzCalloutTestService				&		AdminService				\\
+				CASService		&                       SampleAuthzService		 \\ 
+				ContainerRegistryEntryService		&     SecureCounterService		 \\
+				ContainerRegistryService		&        SecurityTestService		  \\
+				CounterService		&                    ShutdownService			  \\
+				DefaultIndexService		&              SubscriptionManagerService\\
+				DefaultIndexServiceEntry		&        TestAuthzService			  \\
+				DefaultTriggerService		&           TestRPCService				\\
+				DefaultTriggerServiceEntry		&        TestService				\\
+				DelegationFactoryService		&        TestServiceRequest		 \\
+				DelegationService		&                 TestServiceWrongWSDL		  \\
+				DelegationTestService		&           TriggerFactoryService	  \\
+				InMemoryServiceGroup		&              TriggerService				\\
+				InMemoryServiceGroupEntry		&        TriggerServiceEntry		 \\
+				InMemoryServiceGroupFactory		&     Version				\\
+				IndexFactoryService		&              WidgetNotificationService \\
+				IndexService		&                    WidgetService				\\
+				IndexServiceEntry		&                 AuthenticationService	\\
+				ManagedExecutableJobService		&     IndexService				\\
+				ManagedJobFactoryService		&        IndexServiceEntry			 \\
+				ManagedMultiJobService		&           IndexService				\\
+				ManagementService		&                 IndexServiceEntry			\\
+				NotificationConsumerFactoryService	  &PersistenceTestSubscriptionManager		\\
+				NotificationConsumerService		&     ReliableFileTransferFactoryService		\\
+				NotificationTestService		&           ReliableFileTransferService		\\
+				RendezvousFactoryService		& 	\\
+			\bottomrule
+			\end{tabular}
+			\caption{Liste aller laufenden Dienste im Service Container.}
+			\label{tab:containerServices}
+			\end{center}
+		\end{table}
 
 	\subsubsection{Verfügbarkeit von Rssourcen in der Grid-Umgebeung}
 		In der Textdatei \texttt{/usr/bin/machines} stehen die Namen der verfügbaren Rechner.
