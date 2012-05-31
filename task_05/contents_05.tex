@@ -163,9 +163,12 @@
 	
 	\subsubsection{Dokumentieren von Grid-Jobs}
 		Mit dem Befehl
-		\texttt{or i in $(cat /usr/bin/machines); do \\
-		globusrun-ws -submit -f job.xml -F https://${i}:8443 /wsrf/services/ManagedJobFactoryService -factory-type PBS \\
-		;done}
+		\begin{verbatim}
+		for i in \$(cat /usr/bin/machines); do 
+		globusrun-ws -submit -f job.xml -F https://\${i}:8443 \
+		/wsrf/services/ManagedJobFactoryService -factory-type PBS 
+		done
+		\end{verbatim}
 		kann man einen Job auf jeder Ressource starten.
 
 	
