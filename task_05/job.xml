@@ -1,0 +1,4 @@
+<job>
+<executable>/usr/bin/ddate</executable>
+<stdout>${GLOBUS_USER_HOME}/stdout1</stdout>
+</job>
