@@ -153,7 +153,22 @@
 \subsection{Job Submission mit dem Globus Toolkit}
 	% $>globusrun-ws submit -f job.xml
 	\subsubsection{Unterschied zwischen Fork und PBS Job}
+		Mit \texttt{fork} wird nur ein neuer Prozess
+		gestartet der von der Umgebung und dem Scheduling
+		allein dem lokalen Betriebssystem unterliegt.
+		
+		Ein PBS-Jobs unterliegt zusätzlich dem Scheduling Algorithmus des
+		Distributed Ressource Manangers % BUZZWORDONLYLINE!!!!11
+		oder möglicherweise auch einem Meta-Scheduler des Grids.
+	
 	\subsubsection{Dokumentieren von Grid-Jobs}
+		Mit dem Befehl
+		\texttt{or i in $(cat /usr/bin/machines); do \\
+		globusrun-ws -submit -f job.xml -F https://${i}:8443 /wsrf/services/ManagedJobFactoryService -factory-type PBS \\
+		;done}
+
+	
+		\lstinputlisting[language=XML]{./task_05/job.xml}
 		% MDS für Monitoring und Discovery
 		% $>wsrf-query
 
