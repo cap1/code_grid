@@ -160,7 +160,9 @@
 		Ressource \glqq bombay\grqq{} starten. Der Befehl im obrigen Beispiel ist \texttt{/bin/hostname -f}.
 		
 	\subsubsection{Datenverfügbarkeit in der Grid-Umgebung}
-	% $> globus-url-copy && rft
+		Mit \texttt{globus-url-copy} lassen sich Dateien ins und im Grid bewegen.
+		Beispielsweise die Datei \glqq moo\grqq{} nach \glqq bombay\grqq{}:\\
+		 \texttt{globus-url-copy -vb file:///\$PWD/moo gsiftp://bombay/\textasciitilde/}.
 
 \subsection{Job Submission mit dem Globus Toolkit}
 	% $>globusrun-ws submit -f job.xml
