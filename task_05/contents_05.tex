@@ -79,7 +79,20 @@
 		und es ist gültig von 21. Mai 2012, 09:37:35 GMT bis 21. Mai 2013, 09:37:35 GMT.
 		
 	\subsubsection{Prüfen von Grid-Proxy-Zertifikaten}
+		Mit dem Befehl 
+		\texttt{openssl x509 -text -in /tmp/x509up\_1013}
+		lässt sich das Proxy-zertifkat anzeigen.
+		Der Zertifikatsname (DN) ist \texttt{O=org, OU=Instant-Grid, OU=TestGrid, CN=griduser9, CN=857000645}.
+		Der Ausgeber des Zertifikates ist \texttt{O=org, OU=Instant-Grid, OU=TestGrid, CN=griduser9}
+		und es ist gültig vom 31. Mai 2012, 11:05:06 GMT bis zum 31. Mai, 23:10:06 GMT.
+		
 	\subsubsection{Verändern von Grid-Proxy Zertifikaten}
+		Mit dem Befehl
+		\texttt{}
+		lässt sich das Zertifikat um eine Woche verlängern.
+		Um das Proxy-Zertifikat zu löschen kann der Befehl
+		\texttt{}
+		verwendet werden.
 
 \subsection{Grid-Umgebung}
 	\subsubsection{Service Container der Grid-Umgebung}
