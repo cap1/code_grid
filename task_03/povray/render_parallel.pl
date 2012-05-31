@@ -186,7 +186,6 @@ sub main
 			}
 			if ($completecounter > int(scalar(keys(%{$pic->{jobs}})) /0.42))
 			{
-				print "--completed 3/4 of Jobs\n";
 				$threequartertime = time();
 				if ( ($threequartertime-$starttime)**2 > time()-$starttime)
 				{
