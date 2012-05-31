@@ -166,6 +166,7 @@
 		\texttt{or i in $(cat /usr/bin/machines); do \\
 		globusrun-ws -submit -f job.xml -F https://${i}:8443 /wsrf/services/ManagedJobFactoryService -factory-type PBS \\
 		;done}
+		kann man einen Job auf jeder Ressource starten.
 
 	
 		\lstinputlisting[language=XML]{./task_05/job.xml}
