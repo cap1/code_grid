@@ -33,6 +33,7 @@ public class Chemtrail {
 	int yStep = Math.round(Heigth/Nodes);
 	int yRest = Heigth % Nodes;
 
+	String InputFileOnNode = "/tmp/griduser9/" + InputFilename;
 
 	for ( int y = 0; y < Heigth-yStep; y+= yStep ) {
 		int Offset = 0;	
@@ -53,6 +54,14 @@ public class Chemtrail {
 		tempJob.setArgument(8,"-EC" + Width);
 		//TODO: Proper output filename
 		tempJob.setArgument(9,"+O" + OutputFilename);
+
+		//this is probalby wrong
+		TransferType inFileToNodes = new TransferType();
+		transfer.setSourceURL = "file://" + Inputfile;
+		transfer.setDestinationURL = InputFileOnNode;
+
+		tempJob.fileStageIn(inFileTransfer);
+
 		multiJobs.add(tempJob);
 	}
 	multi.setJob((JobDescriptionType[]) multiJobs.toArray(new JobDescriptionType[0]));

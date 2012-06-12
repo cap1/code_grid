@@ -29,7 +29,7 @@ import org.globus.wsrf.impl.SimpleResourceKey;
 
 public class SubmitJob implements GramJobListener  {
 
-        private static Object waiter = new Object();
+	private static Object waiter = new Object();
 
 	private EndpointReferenceType getFactoryEPR (String contact, String factoryType)
 	throws Exception
@@ -39,40 +39,40 @@ public class SubmitJob implements GramJobListener  {
 	}
 
 
-        public void submitJob(MultiJobDescriptionType multi) throws Exception {
-                // create factory epr
-		String contact = "lima";
-		String factoryType = ManagedJobFactoryConstants.FACTORY_TYPE.MULTI;
-		
-		EndpointReferenceType factoryEndpoint = getFactoryEPR(contact,factoryType);
-                ReferencePropertiesType props = new ReferencePropertiesType();
-                SimpleResourceKey key = 
-                        new SimpleResourceKey(ManagedJobConstants.RESOURCE_KEY_QNAME, "Fork");
-                props.add(key.toSOAPElement());
-                endpoint.setProperties(props);
+	public void submitJob(MultiJobDescriptionType multi) throws Exception {
+			// create factory epr
+			String contact = "lima";
+			String factoryType = ManagedJobFactoryConstants.FACTORY_TYPE.MULTI;
 
-                // setup security
-                Authorization authz = HostAuthorization.getInstance();
-                Integer xmlSecurity = Constants.ENCRYPTION;
+			EndpointReferenceType factoryEndpoint = getFactoryEPR(contact,factoryType);
+			ReferencePropertiesType props = new ReferencePropertiesType();
+			SimpleResourceKey key = 
+					  new SimpleResourceKey(ManagedJobConstants.RESOURCE_KEY_QNAME, "Fork");
+			props.add(key.toSOAPElement());
+			endpoint.setProperties(props);
 
-                boolean batchMode = false;
-                boolean limitedDelegation = true;
+			// setup security
+			Authorization authz = HostAuthorization.getInstance();
+			Integer xmlSecurity = Constants.ENCRYPTION;
 
-                // generate job uuid
-                UUIDGen uuidgen   = UUIDGenFactory.getUUIDGen();
-                String submissionID = "uuid:" + uuidgen.nextUUID();
+			boolean batchMode = false;
+			boolean limitedDelegation = true;
 
-                GramJob job = new GramJob(multi);
-                job.setAuthorization(authz);
-                job.setMessageProtectionType(xmlSecurity);
-                job.setDelegationEnabled(true);
-                job.addListener(this);
+			// generate job uuid
+			UUIDGen uuidgen   = UUIDGenFactory.getUUIDGen();
+			String submissionID = "uuid:" + uuidgen.nextUUID();
 
-                job.submit(     	endpoint,
-                                        batchMode,
-                                        limitedDelegation,
-                                        submissionID);
-        }
+			GramJob job = new GramJob(multi);
+			job.setAuthorization(authz);
+			job.setMessageProtectionType(xmlSecurity);
+			job.setDelegationEnabled(true);
+			job.addListener(this);
+
+			job.submit(endpoint,
+			batchMode,
+			limitedDelegation,
+			submissionID);
+	}
 
         // GramJob calls this method when a job changes its state
         // It's part of GramJobListener Interface
