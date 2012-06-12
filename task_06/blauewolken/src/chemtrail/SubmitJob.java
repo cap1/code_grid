@@ -31,22 +31,6 @@ public class SubmitJob implements GramJobListener  {
 
         private static Object waiter = new Object();
 
-        public static void main (String args[]) {
-
-                SubmitJob client = new SubmitJob();
-                System.out.print("submitting job ... ");
-                try {
-                        client.submitJob();
-                        System.out.println("done");
-                        System.out.println("Waiting for notification messages ...");
-                        synchronized (waiter) {
-                                waiter.wait();
-                        }
-                } catch (Exception e) {
-                        e.printStackTrace();
-                }
-        }
-
         public void submitJob() throws Exception {
                 // create factory epr
                 EndpointReferenceType endpoint = new EndpointReferenceType();
