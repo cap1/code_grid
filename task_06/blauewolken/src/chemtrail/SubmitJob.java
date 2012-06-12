@@ -31,21 +31,26 @@ public class SubmitJob implements GramJobListener  {
 
         private static Object waiter = new Object();
 
-        public void submitJob() throws Exception {
+	private EndpointReferenceType getFactoryEPR (String contact, String factoryType)
+	throws Exception
+	{
+   		URL factoryUrl = ManagedJobFactoryClientHelper.getServiceURL(contact).getURL();
+    		return ManagedJobFactoryClientHelper.getFactoryEndpoint(factoryUrl, factoryType);
+	}
+
+
+        public void submitJob(MultiJobDescriptionType multi) throws Exception {
                 // create factory epr
-                EndpointReferenceType endpoint = new EndpointReferenceType();
-                endpoint.setAddress(new Address
-                        ("https://server:8443/wsrf/services/ManagedJobFactoryService"));
+		String contact = "lima";
+		String factoryType = ManagedJobFactoryConstants.FACTORY_TYPE.MULTI;
+		
+		EndpointReferenceType factoryEndpoint = getFactoryEPR(contact,factoryType);
                 ReferencePropertiesType props = new ReferencePropertiesType();
                 SimpleResourceKey key = 
                         new SimpleResourceKey(ManagedJobConstants.RESOURCE_KEY_QNAME, "Fork");
                 props.add(key.toSOAPElement());
                 endpoint.setProperties(props);
 
-                // job rsl
-                String rsl = 
-                        "<job><executable>/bin/sleep</executable><argument>100</argument></job>";
-  
                 // setup security
                 Authorization authz = HostAuthorization.getInstance();
                 Integer xmlSecurity = Constants.ENCRYPTION;
@@ -57,13 +62,13 @@ public class SubmitJob implements GramJobListener  {
                 UUIDGen uuidgen   = UUIDGenFactory.getUUIDGen();
                 String submissionID = "uuid:" + uuidgen.nextUUID();
 
-                GramJob job = new GramJob(rsl);
+                GramJob job = new GramJob(multi);
                 job.setAuthorization(authz);
                 job.setMessageProtectionType(xmlSecurity);
                 job.setDelegationEnabled(true);
                 job.addListener(this);
 
-                job.submit(     endpoint,
+                job.submit(     	endpoint,
                                         batchMode,
                                         limitedDelegation,
                                         submissionID);

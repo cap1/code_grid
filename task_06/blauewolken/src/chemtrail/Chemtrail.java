@@ -14,17 +14,50 @@ public class Chemtrail {
             System.exit(-1);
         }
         
-        String input_filename = args[0];
-        String output_filename = args[3];
+        String InputFilename = args[0];
+        String OutputFilename = args[3];
         
-        int width = Integer.parseInt(args[1]);
-        int height = Integer.parseInt(args[2]);
+        int Width = Integer.parseInt(args[1]);
+        int Height = Integer.parseInt(args[2]);
        
-        System.out.println("Processing " + input_filename + " with size of " + width +"x" + height);
+        System.out.println("Processing " + InputFilename + " with size of " + Width +"x" + Height);
+
+
+		
+	MultiJobDescriptionType multi = new MultiJobDescriptionType;
+	List<JobDescriptionType> multiJobs = new ArrayList<JobDescriptionType>();
+
+	//TODO: Query middleware 'bout this
+	int Nodes = 4;
+	
+	int yStep = Math.round(Heigth/Nodes);
+	int yRest = Heigth % Nodes;
+
+
+	for ( int y = 0; y < Heigth-yStep; y+= yStep ) {
+		int Offset = 0;	
+		if(yRest != 0) {
+			Offset=1;
+			yRest--;
+		}
+		tempJob = new JobDescriptionType ();
+		tempJob.setExecutable("/usr/bin/povray");
+		tempJob.setArgument(0,"-I" + InputFilename);
+		tempJob.setArgument(1,"-FT");
+		tempJob.setArgument(2,"-WL0");
+		tempJob.setArgument(3,"-W" + Width);
+		tempJob.setArgument(4,"-H" + Height);
+		tempJob.setArgument(5,"-SR" + y+1);
+		tempJob.setArgument(6,"-ER" + y + yStep + Offset);
+		tempJob.setArgument(7,"-SC1");
+		tempJob.setArgument(8,"-EC" + Width);
+		//TODO: Proper output filename
+		tempJob.setArgument(9,"+O" + OutputFilename);
+		multiJobs.add(tempJob);
+	}
+	multi.setJob((JobDescriptionType[]) multiJobs.toArray(new JobDescriptionType[0]));
+	
+		
+
     }
-    
-    
-    
-
-
 }
