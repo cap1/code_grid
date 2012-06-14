@@ -1,5 +1,7 @@
 package chemtrail;
 
+import java.net.URL;
+
 import javax.xml.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,10 +20,13 @@ import org.apache.axis.message.addressing.ReferencePropertiesType;
 import org.apache.axis.message.addressing.Address;
 import org.globus.exec.client.GramJob;
 import org.globus.exec.client.GramJobListener;
+import org.globus.exec.generated.MultiJobDescriptionType;
 import org.globus.exec.generated.StateEnumeration;
 import org.globus.exec.generated.JobDescriptionType;
 import org.globus.exec.generated.FilePairType;
 import org.globus.exec.utils.ManagedJobConstants;
+import org.globus.exec.utils.ManagedJobFactoryConstants;
+import org.globus.exec.utils.client.ManagedJobFactoryClientHelper;
 import org.globus.wsrf.impl.security.authentication.Constants;
 import org.globus.wsrf.impl.security.authorization.Authorization;
 import org.globus.wsrf.impl.security.authorization.HostAuthorization;
@@ -34,7 +39,7 @@ public class SubmitJob implements GramJobListener  {
 	private EndpointReferenceType getFactoryEPR (String contact, String factoryType)
 	throws Exception
 	{
-   		URL factoryUrl = ManagedJobFactoryClientHelper.getServiceURL(contact).getURL();
+   			URL factoryUrl = ManagedJobFactoryClientHelper.getServiceURL(contact).getURL();
     		return ManagedJobFactoryClientHelper.getFactoryEndpoint(factoryUrl, factoryType);
 	}
 
@@ -49,7 +54,7 @@ public class SubmitJob implements GramJobListener  {
 			SimpleResourceKey key = 
 					  new SimpleResourceKey(ManagedJobConstants.RESOURCE_KEY_QNAME, "Fork");
 			props.add(key.toSOAPElement());
-			endpoint.setProperties(props);
+			factoryEndpoint.setProperties(props);
 
 			// setup security
 			Authorization authz = HostAuthorization.getInstance();
@@ -68,7 +73,7 @@ public class SubmitJob implements GramJobListener  {
 			job.setDelegationEnabled(true);
 			job.addListener(this);
 
-			job.submit(endpoint,
+			job.submit(factoryEndpoint,
 			batchMode,
 			limitedDelegation,
 			submissionID);

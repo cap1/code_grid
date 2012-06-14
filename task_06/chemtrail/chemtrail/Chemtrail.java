@@ -10,12 +10,72 @@ import org.globus.exec.generated.MultiJobDescriptionType;
 import org.globus.rft.generated.RFTOptionsType;
 import org.globus.rft.generated.TransferRequestType;
 import org.globus.rft.generated.TransferType;
+import org.apache.axis.message.addressing.EndpointReferenceType;
+import org.globus.exec.utils.ManagedJobConstants;
+import org.globus.exec.utils.ManagedJobFactoryConstants;
+import org.globus.exec.utils.client.ManagedJobFactoryClientHelper;
+import java.net.URL;
 
 import chemtrail.SubmitJob;
 import chemtrail.MDS4Client;
 
 public class Chemtrail {
+
+	static String contact = "lima";
+
+	public static EndpointReferenceType getFactoryEPR (String contact, String factoryType)
+	throws Exception {
+   			URL factoryUrl = ManagedJobFactoryClientHelper.getServiceURL(contact).getURL();
+    		return ManagedJobFactoryClientHelper.getFactoryEndpoint(factoryUrl, factoryType);
+	}
+
+
+	private static JobDescriptionType createJob (String InputFileName, int Width, int Heigth, int y,int yStep, int Offset) {
+
+		JobDescriptionType tempJob = new JobDescriptionType();
+		String BaseName = (new File(InputFileName)).getName();
+		String InputFileOnNode = "/tmp/griduser9" + BaseName;
+		
+		
+		tempJob.setExecutable("/usr/bin/povray");
+		String arguments[] = new String[10];
+		arguments[0] =  "-I" + InputFileName;
+		arguments[1] =  "-FT";
+		arguments[2] = "-WL0";
+		arguments[3] = "-W" + Width;
+		arguments[4] = "-H" + Heigth;
+		arguments[5] = "-SR" + y + 1;
+		arguments[6] = "-ER" + y + yStep + Offset;
+		arguments[7] = "-SC1";
+		arguments[8] = "-EC" + Width;
+		// TODO: Proper output filename
+		arguments[9] = "+O" + "/tmp/" + "griduser9" + BaseName + y;
+		tempJob.setArgument(arguments);
+
+		TransferType inFileTransfer = new TransferType();
+		inFileTransfer.setSourceUrl("file://" + InputFileName);
+		inFileTransfer.setDestinationUrl(InputFileOnNode);
+
+		TransferRequestType request = new TransferRequestType();
+		request.setTransfer(new TransferType[1]);
+		request.setTransfer(0, inFileTransfer);
+		tempJob.setFileStageIn(request);
 	
+		String factoryType = ManagedJobFactoryConstants.FACTORY_TYPE.FORK;
+		try {
+			EndpointReferenceType factoryEndpoint = Chemtrail.getFactoryEPR(Chemtrail.contact,factoryType);
+			tempJob.setFactoryEndpoint(factoryEndpoint);	
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		
+		//TransferType inFileTransfer = new TransferType();
+		//inFileTransfer.setSourceUrl("file://" + InputFileName);
+		//inFileTransfer.setDestinationUrl(InputFileOnNode);
+		return tempJob;
+	}
 
 	public static void main(String[] args) {
 		String usage = "Usage:\n./chemtrail inputfile width height outputfile";
@@ -33,7 +93,11 @@ public class Chemtrail {
 		System.out.println("Processing " + InputFileName + " with size of "
 				+ Width + "x" + Heigth);
 
+		String contact = "lima";
 
+
+
+		//Using the MDS4 client to get some information
 		chemtrail.MDS4Client mds4 = new chemtrail.MDS4Client();
 		ArrayList list = null;
 		String stringAddress = "https://localhost:8443/wsrf/services/DefaultIndexService";
@@ -57,17 +121,15 @@ public class Chemtrail {
 		MultiJobDescriptionType multi = new MultiJobDescriptionType();
 		List<JobDescriptionType> multiJobs = new ArrayList<JobDescriptionType>();
 
+		//Setting number of nodes we want to use
 		int Nodes = 2;
 		if(list != null) {
 			Nodes = list.size();
 		}
 
+		//Job calculation and creation
 		int yStep = Math.round(Heigth / Nodes);
 		int yRest = Heigth % Nodes;
-		
-		String BaseName = (new File(InputFileName)).getName();
-
-		String InputFileOnNode = "/tmp/griduser9" + BaseName;
 
 		for (int y = 0; y < Heigth - yStep; y += yStep) {
 			int Offset = 0;
@@ -75,37 +137,11 @@ public class Chemtrail {
 				Offset = 1;
 				yRest--;
 			}
-			JobDescriptionType tempJob = new JobDescriptionType();
-			tempJob.setExecutable("/usr/bin/povray");
-			String arguments[] = new String[10];
-			arguments[0] =  "-I" + InputFileName;
-			arguments[1] =  "-FT";
-			arguments[2] = "-WL0";
-			arguments[3] = "-W" + Width;
-			arguments[4] = "-H" + Heigth;
-			arguments[5] = "-SR" + y + 1;
-			arguments[6] = "-ER" + y + yStep + Offset;
-			arguments[7] = "-SC1";
-			arguments[8] = "-EC" + Width;
-			// TODO: Proper output filename
-			arguments[9] = "+O" + "/tmp/" + "griduser9" + BaseName + y;
-			tempJob.setArgument(arguments);
-
-			TransferType inFileTransfer = new TransferType();
-			inFileTransfer.setSourceUrl("file://" + InputFileName);
-			inFileTransfer.setDestinationUrl(InputFileOnNode);
-
-			TransferRequestType request = new TransferRequestType();
-			request.setTransfer(new TransferType[1]);
-			request.setTransfer(0, inFileTransfer);
-			tempJob.setFileStageIn(request);
-			
-			//TransferType inFileTransfer = new TransferType();
-			//inFileTransfer.setSourceUrl("file://" + InputFileName);
-			//inFileTransfer.setDestinationUrl(InputFileOnNode);
-
-			multiJobs.add(tempJob);
+			multiJobs.add(Chemtrail.createJob(InputFileName,Width,Heigth,y,yStep,Offset));
 		}
+
+
+		//Submit multijob
 		multi.setJob((JobDescriptionType[]) multiJobs
 				.toArray(new JobDescriptionType[0]));
 		
