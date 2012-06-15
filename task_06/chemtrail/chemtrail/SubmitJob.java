@@ -36,47 +36,50 @@ public class SubmitJob implements GramJobListener  {
 
 	private static Object waiter = new Object();
 
-	private EndpointReferenceType getFactoryEPR (String contact, String factoryType)
-	throws Exception
-	{
-   			URL factoryUrl = ManagedJobFactoryClientHelper.getServiceURL(contact).getURL();
-    		return ManagedJobFactoryClientHelper.getFactoryEndpoint(factoryUrl, factoryType);
+	public static Object getWaiter() {
+		return waiter;
 	}
+
 
 
 	public void submitJob(MultiJobDescriptionType multi) throws Exception {
 			// create factory epr
 			String contact = "lima";
 			String factoryType = ManagedJobFactoryConstants.FACTORY_TYPE.MULTI;
+			try {
+			
+				EndpointReferenceType factoryEndpoint = Chemtrail.getFactoryEPR(contact,factoryType);
+				ReferencePropertiesType props = new ReferencePropertiesType();
+				SimpleResourceKey key = 
+						  new SimpleResourceKey(ManagedJobConstants.RESOURCE_KEY_QNAME, "Fork");
+				props.add(key.toSOAPElement());
+				factoryEndpoint.setProperties(props);
 
-			EndpointReferenceType factoryEndpoint = getFactoryEPR(contact,factoryType);
-			ReferencePropertiesType props = new ReferencePropertiesType();
-			SimpleResourceKey key = 
-					  new SimpleResourceKey(ManagedJobConstants.RESOURCE_KEY_QNAME, "Fork");
-			props.add(key.toSOAPElement());
-			factoryEndpoint.setProperties(props);
+				// setup security
+				Authorization authz = HostAuthorization.getInstance();
+				Integer xmlSecurity = Constants.ENCRYPTION;
 
-			// setup security
-			Authorization authz = HostAuthorization.getInstance();
-			Integer xmlSecurity = Constants.ENCRYPTION;
+				boolean batchMode = false;
+				boolean limitedDelegation = true;
 
-			boolean batchMode = false;
-			boolean limitedDelegation = true;
+				// generate job uuid
+				UUIDGen uuidgen   = UUIDGenFactory.getUUIDGen();
+				String submissionID = "uuid:" + uuidgen.nextUUID();
 
-			// generate job uuid
-			UUIDGen uuidgen   = UUIDGenFactory.getUUIDGen();
-			String submissionID = "uuid:" + uuidgen.nextUUID();
+				GramJob job = new GramJob(multi);
+				job.setAuthorization(authz);
+				job.setMessageProtectionType(xmlSecurity);
+				job.setDelegationEnabled(true);
+				job.addListener(this);
 
-			GramJob job = new GramJob(multi);
-			job.setAuthorization(authz);
-			job.setMessageProtectionType(xmlSecurity);
-			job.setDelegationEnabled(true);
-			job.addListener(this);
-
-			job.submit(factoryEndpoint,
-			batchMode,
-			limitedDelegation,
-			submissionID);
+				job.submit(factoryEndpoint,
+				batchMode,
+				limitedDelegation,
+				submissionID);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}	
 	}
 
         // GramJob calls this method when a job changes its state
