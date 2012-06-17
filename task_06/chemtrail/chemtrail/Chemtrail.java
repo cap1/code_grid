@@ -14,6 +14,7 @@ import org.apache.axis.message.addressing.EndpointReferenceType;
 import org.globus.exec.utils.ManagedJobConstants;
 import org.globus.exec.utils.ManagedJobFactoryConstants;
 import org.globus.exec.utils.client.ManagedJobFactoryClientHelper;
+import org.apache.axis.message.addressing.AttributedURI;
 import java.net.URL;
 
 import chemtrail.SubmitJob;
@@ -28,9 +29,15 @@ public class Chemtrail {
    			URL factoryUrl = ManagedJobFactoryClientHelper.getServiceURL(contact).getURL();
     		return ManagedJobFactoryClientHelper.getFactoryEndpoint(factoryUrl, factoryType);
 	}
+	
+	public static EndpointReferenceType getFactoryEPR (URL factoryURL, String factoryType)
+	throws Exception {
+   		return ManagedJobFactoryClientHelper.getFactoryEndpoint(factoryURL, factoryType);
+	}
 
 
-	private static JobDescriptionType createJob (String InputFileName, int Width, int Heigth, int y,int yStep, int Offset) {
+	//Method for creating one  
+	private static JobDescriptionType createJob (String InputFileName, int Width, int Heigth, int y,int yStep, int Offset, String target) {
 
 		JobDescriptionType tempJob = new JobDescriptionType();
 		String BaseName = (new File(InputFileName)).getName();
@@ -38,32 +45,40 @@ public class Chemtrail {
 		
 		
 		tempJob.setExecutable("/usr/bin/povray");
-		String arguments[] = new String[10];
+		String arguments[] = new String[9];
+		//
 		arguments[0] =  "-I" + InputFileName;
-		arguments[1] =  "-FT";
-		arguments[2] = "-WL0";
-		arguments[3] = "-W" + Width;
-		arguments[4] = "-H" + Heigth;
-		arguments[5] = "-SR" + y + 1;
-		arguments[6] = "-ER" + y + yStep + Offset;
-		arguments[7] = "-SC1";
-		arguments[8] = "-EC" + Width;
+		arguments[1] =  "+FT";
+		arguments[2] = "-W" + Width;
+		arguments[3] = "-H" + Heigth;
+		arguments[4] = "-SR" + (y + 1);
+		arguments[5] = "-ER" + (y + yStep + Offset);
+		arguments[6] = "-SC1";
+		arguments[7] = "-EC" + Width;
 		// TODO: Proper output filename
-		arguments[9] = "+O" + "/tmp/" + "griduser9" + BaseName + y;
+		arguments[8] = "+O" + "/tmp/" + "griduser9" + y + "_" + BaseName +  ".tga";
 		tempJob.setArgument(arguments);
+		
+		tempJob.setDirectory("/tmp");
+		tempJob.setStdout("/tmp/griduser9.stdout");
+		tempJob.setStderr("/tmp/griduser9.stderr");
 
 		TransferType inFileTransfer = new TransferType();
 		inFileTransfer.setSourceUrl("file://" + InputFileName);
-		inFileTransfer.setDestinationUrl(InputFileOnNode);
-
+		inFileTransfer.setDestinationUrl("gsiftp://"+ target  + InputFileOnNode);
+	
+		System.out.println(inFileTransfer.getSourceUrl());
+		System.out.println(inFileTransfer.getDestinationUrl());
 		TransferRequestType request = new TransferRequestType();
 		request.setTransfer(new TransferType[1]);
 		request.setTransfer(0, inFileTransfer);
-		tempJob.setFileStageIn(request);
+		
+		//As soon as we do filestaging, the job fails with actually no error output. Therefore, filestaging is disabled so far. 
+		//tempJob.setFileStageIn(request);
 	
 		String factoryType = ManagedJobFactoryConstants.FACTORY_TYPE.FORK;
 		try {
-			EndpointReferenceType factoryEndpoint = Chemtrail.getFactoryEPR(Chemtrail.contact,factoryType);
+			EndpointReferenceType factoryEndpoint = Chemtrail.getFactoryEPR(target,factoryType);
 			tempJob.setFactoryEndpoint(factoryEndpoint);	
 		}
 		catch (Exception e) {
@@ -71,9 +86,12 @@ public class Chemtrail {
 		}
 
 		
-		//TransferType inFileTransfer = new TransferType();
-		//inFileTransfer.setSourceUrl("file://" + InputFileName);
-		//inFileTransfer.setDestinationUrl(InputFileOnNode);
+		System.out.print(tempJob.getExecutable());
+		for(int i=0; i<tempJob.getArgument().length;i++)
+		{
+			System.out.print(" " + tempJob.getArgument(i));
+		}
+		System.out.println();
 		return tempJob;
 	}
 
@@ -93,10 +111,6 @@ public class Chemtrail {
 		System.out.println("Processing " + InputFileName + " with size of "
 				+ Width + "x" + Heigth);
 
-		String contact = "lima";
-
-
-
 		//Using the MDS4 client to get some information
 		chemtrail.MDS4Client mds4 = new chemtrail.MDS4Client();
 		ArrayList list = null;
@@ -108,8 +122,10 @@ public class Chemtrail {
 			
 			//Debug output: List ALL the factories we found
 			for (Iterator it= list.iterator(); it.hasNext();) {
-				System.out.println(it.next());
+				//System.out.println(it.next());
+				System.out.println(((AttributedURI)it.next()).getHost());
 			}
+			System.out.println("Found " + list.size() + " nodes");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -131,13 +147,15 @@ public class Chemtrail {
 		int yStep = Math.round(Heigth / Nodes);
 		int yRest = Heigth % Nodes;
 
+		Iterator it = list.iterator();
 		for (int y = 0; y < Heigth - yStep; y += yStep) {
 			int Offset = 0;
 			if (yRest != 0) {
 				Offset = 1;
 				yRest--;
 			}
-			multiJobs.add(Chemtrail.createJob(InputFileName,Width,Heigth,y,yStep,Offset));
+			multiJobs.add(Chemtrail.createJob(InputFileName,Width,Heigth,y,yStep,Offset,((AttributedURI)it.next()).getHost()));
+			System.out.println();
 		}
 
 
