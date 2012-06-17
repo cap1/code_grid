@@ -44,18 +44,19 @@ public class SubmitJob implements GramJobListener  {
 
 	public void submitJob(MultiJobDescriptionType multi) throws Exception {
 			// create factory epr
-			String contact = "lima";
 			String factoryType = ManagedJobFactoryConstants.FACTORY_TYPE.MULTI;
 			try {
+				System.out.println("Preparing for job submission");
 			
-				EndpointReferenceType factoryEndpoint = Chemtrail.getFactoryEPR(contact,factoryType);
+				EndpointReferenceType factoryEndpoint = Chemtrail.getFactoryEPR(Chemtrail.contact,factoryType);
 				ReferencePropertiesType props = new ReferencePropertiesType();
 				SimpleResourceKey key = 
-						  new SimpleResourceKey(ManagedJobConstants.RESOURCE_KEY_QNAME, "Fork");
+						  new SimpleResourceKey(ManagedJobConstants.RESOURCE_KEY_QNAME, "Multi");
 				props.add(key.toSOAPElement());
 				factoryEndpoint.setProperties(props);
 
 				// setup security
+				System.out.println("Setting security parameters");
 				Authorization authz = HostAuthorization.getInstance();
 				Integer xmlSecurity = Constants.ENCRYPTION;
 
@@ -63,6 +64,7 @@ public class SubmitJob implements GramJobListener  {
 				boolean limitedDelegation = true;
 
 				// generate job uuid
+				System.out.println("Generating Job UUID");
 				UUIDGen uuidgen   = UUIDGenFactory.getUUIDGen();
 				String submissionID = "uuid:" + uuidgen.nextUUID();
 
@@ -71,11 +73,13 @@ public class SubmitJob implements GramJobListener  {
 				job.setMessageProtectionType(xmlSecurity);
 				job.setDelegationEnabled(true);
 				job.addListener(this);
-
+				
+				System.out.println("Submitting job");
 				job.submit(factoryEndpoint,
 				batchMode,
 				limitedDelegation,
 				submissionID);
+				System.out.println("Multijob submitted");
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -88,6 +92,7 @@ public class SubmitJob implements GramJobListener  {
         
                 StateEnumeration jobState = job.getState();
                 System.out.println("got state notifiation: job is in state " + jobState);
+		
                 if (jobState.equals(StateEnumeration.Done)
                                 || jobState.equals(StateEnumeration.Failed)) {
                         System.out.print("job finished. destroying job resource ... ");
