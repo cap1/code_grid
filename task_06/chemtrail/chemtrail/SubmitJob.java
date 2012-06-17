@@ -36,47 +36,54 @@ public class SubmitJob implements GramJobListener  {
 
 	private static Object waiter = new Object();
 
-	private EndpointReferenceType getFactoryEPR (String contact, String factoryType)
-	throws Exception
-	{
-   			URL factoryUrl = ManagedJobFactoryClientHelper.getServiceURL(contact).getURL();
-    		return ManagedJobFactoryClientHelper.getFactoryEndpoint(factoryUrl, factoryType);
+	public static Object getWaiter() {
+		return waiter;
 	}
+
 
 
 	public void submitJob(MultiJobDescriptionType multi) throws Exception {
 			// create factory epr
-			String contact = "lima";
 			String factoryType = ManagedJobFactoryConstants.FACTORY_TYPE.MULTI;
+			try {
+				System.out.println("Preparing for job submission");
+			
+				EndpointReferenceType factoryEndpoint = Chemtrail.getFactoryEPR(Chemtrail.contact,factoryType);
+				ReferencePropertiesType props = new ReferencePropertiesType();
+				SimpleResourceKey key = 
+						  new SimpleResourceKey(ManagedJobConstants.RESOURCE_KEY_QNAME, "Multi");
+				props.add(key.toSOAPElement());
+				factoryEndpoint.setProperties(props);
 
-			EndpointReferenceType factoryEndpoint = getFactoryEPR(contact,factoryType);
-			ReferencePropertiesType props = new ReferencePropertiesType();
-			SimpleResourceKey key = 
-					  new SimpleResourceKey(ManagedJobConstants.RESOURCE_KEY_QNAME, "Fork");
-			props.add(key.toSOAPElement());
-			factoryEndpoint.setProperties(props);
+				// setup security
+				System.out.println("Setting security parameters");
+				Authorization authz = HostAuthorization.getInstance();
+				Integer xmlSecurity = Constants.ENCRYPTION;
 
-			// setup security
-			Authorization authz = HostAuthorization.getInstance();
-			Integer xmlSecurity = Constants.ENCRYPTION;
+				boolean batchMode = false;
+				boolean limitedDelegation = true;
 
-			boolean batchMode = false;
-			boolean limitedDelegation = true;
+				// generate job uuid
+				System.out.println("Generating Job UUID");
+				UUIDGen uuidgen   = UUIDGenFactory.getUUIDGen();
+				String submissionID = "uuid:" + uuidgen.nextUUID();
 
-			// generate job uuid
-			UUIDGen uuidgen   = UUIDGenFactory.getUUIDGen();
-			String submissionID = "uuid:" + uuidgen.nextUUID();
-
-			GramJob job = new GramJob(multi);
-			job.setAuthorization(authz);
-			job.setMessageProtectionType(xmlSecurity);
-			job.setDelegationEnabled(true);
-			job.addListener(this);
-
-			job.submit(factoryEndpoint,
-			batchMode,
-			limitedDelegation,
-			submissionID);
+				GramJob job = new GramJob(multi);
+				job.setAuthorization(authz);
+				job.setMessageProtectionType(xmlSecurity);
+				job.setDelegationEnabled(true);
+				job.addListener(this);
+				
+				System.out.println("Submitting job");
+				job.submit(factoryEndpoint,
+				batchMode,
+				limitedDelegation,
+				submissionID);
+				System.out.println("Multijob submitted");
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}	
 	}
 
         // GramJob calls this method when a job changes its state
@@ -85,6 +92,7 @@ public class SubmitJob implements GramJobListener  {
         
                 StateEnumeration jobState = job.getState();
                 System.out.println("got state notifiation: job is in state " + jobState);
+		
                 if (jobState.equals(StateEnumeration.Done)
                                 || jobState.equals(StateEnumeration.Failed)) {
                         System.out.print("job finished. destroying job resource ... ");
