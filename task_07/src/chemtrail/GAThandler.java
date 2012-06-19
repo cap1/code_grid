@@ -87,11 +87,7 @@ public class GAThandler implements gatfs {
 
 	public void setAdaptorname(String adaptorname) {
 		this.prefs.put("File.adaptor.name", adaptorname);
-	}
-
-
-	
-	
+	}	
 	
 	
 	private GATContext generateGATcontext()
@@ -111,17 +107,18 @@ public class GAThandler implements gatfs {
 	
 	@Override
 	public void createFile(URI FileName) {
-		// TODO Auto-generated method stub
 		GATContext context = this.generateGATcontext();
 		try {
-			File file = GAT.createFile(context,FileName.getPath());
+			File file = GAT.createFile(context,FileName);
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} catch (GATObjectCreationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-
+		GAT.end();
 	}
 
 	/* (non-Javadoc)
@@ -129,8 +126,14 @@ public class GAThandler implements gatfs {
 	 */
 	@Override
 	public void createDir(URI DirName) throws Exception {
-		// TODO Auto-generated method stub
-		
+		GATContext context = this.generateGATcontext();
+		try {
+			File file = GAT.createFile(context,DirName);
+			file.mkdir();
+		} catch (GATObjectCreationException e) {
+			e.printStackTrace();
+		}
+		GAT.end();
 	}
 
 	/* (non-Javadoc)
@@ -156,8 +159,23 @@ public class GAThandler implements gatfs {
 	 */
 	@Override
 	public ArrayList<URI> readDir(URI DirName) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		GATContext context = this.generateGATcontext();
+		ArrayList<URI> result = new ArrayList<URI>();
+		try {
+			File dir = GAT.createFile(context, DirName);
+			if(dir.isDirectory()) {
+				for (int i = 0; i < dir.list().length; i++) {
+					result.add(new URI(dir.list()[i]));
+				}
+			}
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		GAT.end();
+		return result;
 	}
 
 	/* (non-Javadoc)
