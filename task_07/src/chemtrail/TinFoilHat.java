@@ -20,19 +20,13 @@ public class TinFoilHat {
 		//Testing creation of a new, empty file
 		try {
 			handler.createFile(new URI("foo"));
-			//System.out.println("Successfully created file");
-			
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		//Testing creation of a new, empty dir
 		try {
 			handler.createDir(new URI("blarg"));
-			
-			//System.out.println("Successfully created dir");
-			
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -50,9 +44,7 @@ public class TinFoilHat {
 				System.out.println(file.getPath());
 				}
 			}
-			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	

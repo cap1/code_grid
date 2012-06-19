@@ -141,8 +141,17 @@ public class GAThandler implements gatfs {
 	 */
 	@Override
 	public void deleteDir(URI DirName) throws Exception {
-		// TODO Auto-generated method stub
-		
+		GATContext context = this.generateGATcontext();
+		try {
+			File file = GAT.createFile(context,DirName);
+			if(file.isDirectory() ) {
+				file.delete();
+				
+			}
+		} catch (GATObjectCreationException e) {
+			e.printStackTrace();
+		}
+		GAT.end();
 	}
 
 	/* (non-Javadoc)
