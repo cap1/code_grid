@@ -10,7 +10,7 @@ public class TinFoilHat {
 
 	public static void main(String args[]){
 		System.getProperties().setProperty("gat.adaptor.path", 
-											"src/resources/lib/adaptors");
+											"resources/lib/adaptors");
 		
 		GAThandler handler = new GAThandler("cert.pem","gridftp");
 		try {

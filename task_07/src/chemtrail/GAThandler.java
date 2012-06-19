@@ -1,6 +1,7 @@
 package chemtrail;
 
 import java.io.*;
+import java.util.ArrayList;
 
 
 import org.gridlab.gat.GAT;
@@ -123,52 +124,76 @@ public class GAThandler implements gatfs {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#createDir(org.gridlab.gat.URI)
+	 */
 	@Override
-	public void createDir() {
+	public void createDir(URI DirName) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#deleteDir(org.gridlab.gat.URI)
+	 */
 	@Override
-	public void readFile() {
+	public void deleteDir(URI DirName) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#deleteFile(org.gridlab.gat.URI)
+	 */
 	@Override
-	public void readDir() {
+	public void deleteFile(URI FileName) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#readDir(org.gridlab.gat.URI)
+	 */
 	@Override
-	public void deleteFile() {
+	public ArrayList<URI> readDir(URI DirName) throws Exception {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#readFile(org.gridlab.gat.URI)
+	 */
 	@Override
-	public void deleteDir() {
+	public Object readFile(URI FileName) throws Exception {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#renameDir(org.gridlab.gat.URI, org.gridlab.gat.URI)
+	 */
 	@Override
-	public void updateFile() {
+	public void renameDir(URI OldDirName, URI NewDirName) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#renameFile(org.gridlab.gat.URI, org.gridlab.gat.URI)
+	 */
 	@Override
-	public void renameDir() {
+	public void renameFile(URI OldFileName, URI NewFileName) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#updateFile(org.gridlab.gat.URI, java.lang.Object)
+	 */
 	@Override
-	public void renameFile() {
+	public void updateFile(URI Filename, Object Data) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 }
