@@ -1,6 +1,7 @@
 package chemtrail;
 
 import java.io.*;
+import java.util.ArrayList;
 
 
 import org.gridlab.gat.GAT;
@@ -86,11 +87,7 @@ public class GAThandler implements gatfs {
 
 	public void setAdaptorname(String adaptorname) {
 		this.prefs.put("File.adaptor.name", adaptorname);
-	}
-
-
-	
-	
+	}	
 	
 	
 	private GATContext generateGATcontext()
@@ -110,65 +107,120 @@ public class GAThandler implements gatfs {
 	
 	@Override
 	public void createFile(URI FileName) {
-		// TODO Auto-generated method stub
 		GATContext context = this.generateGATcontext();
 		try {
-			File file = GAT.createFile(context,FileName.getPath());
+			File file = GAT.createFile(context,FileName);
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} catch (GATObjectCreationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		GAT.end();
+	}
+
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#createDir(org.gridlab.gat.URI)
+	 */
+	@Override
+	public void createDir(URI DirName) throws Exception {
+		GATContext context = this.generateGATcontext();
+		try {
+			File file = GAT.createFile(context,DirName);
+			file.mkdir();
+		} catch (GATObjectCreationException e) {
+			e.printStackTrace();
+		}
+		GAT.end();
+	}
+
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#deleteDir(org.gridlab.gat.URI)
+	 */
+	@Override
+	public void deleteDir(URI DirName) throws Exception {
+		GATContext context = this.generateGATcontext();
+		try {
+			File file = GAT.createFile(context,DirName);
+			if(file.isDirectory() ) {
+				file.delete();
+				
+			}
+		} catch (GATObjectCreationException e) {
+			e.printStackTrace();
+		}
+		GAT.end();
+	}
+
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#deleteFile(org.gridlab.gat.URI)
+	 */
+	@Override
+	public void deleteFile(URI FileName) throws Exception {
+		// TODO Auto-generated method stub
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#readDir(org.gridlab.gat.URI)
+	 */
+	@Override
+	public ArrayList<URI> readDir(URI DirName) throws Exception {
+		GATContext context = this.generateGATcontext();
+		ArrayList<URI> result = new ArrayList<URI>();
+		try {
+			File dir = GAT.createFile(context, DirName);
+			if(dir.isDirectory()) {
+				for (int i = 0; i < dir.list().length; i++) {
+					result.add(new URI(dir.list()[i]));
+				}
+			}
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		GAT.end();
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#readFile(org.gridlab.gat.URI)
+	 */
+	@Override
+	public Object readFile(URI FileName) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#renameDir(org.gridlab.gat.URI, org.gridlab.gat.URI)
+	 */
+	@Override
+	public void renameDir(URI OldDirName, URI NewDirName) throws Exception {
+		// TODO Auto-generated method stub
 		
-
 	}
 
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#renameFile(org.gridlab.gat.URI, org.gridlab.gat.URI)
+	 */
 	@Override
-	public void createDir() {
+	public void renameFile(URI OldFileName, URI NewFileName) throws Exception {
 		// TODO Auto-generated method stub
-
+		
 	}
 
+	/* (non-Javadoc)
+	 * @see chemtrail.gatfs#updateFile(org.gridlab.gat.URI, java.lang.Object)
+	 */
 	@Override
-	public void readFile() {
+	public void updateFile(URI Filename, Object Data) throws Exception {
 		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void readDir() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void deleteFile() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void deleteDir() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateFile() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void renameDir() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void renameFile() {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 }
