@@ -17,14 +17,8 @@ public class TinFoilHat {
 		GAThandler handler = new GAThandler("cert.pem","gridftp");
 		
 		
-		//Testing creation of a new, empty file
-		try {
-			handler.createFile(new URI("foo"));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
-		
 		//Testing creation of a new, empty dir
+		System.out.println("Creating directory 'blarg'");
 		try {
 			handler.createDir(new URI("blarg"));
 		} catch (URISyntaxException e) {
@@ -33,11 +27,18 @@ public class TinFoilHat {
 			e.printStackTrace();
 		}
 		
-		
+		//Testing creation of a new, empty file
+		System.out.println("Creating file 'blarg/blubb'");
+		try {
+			handler.createFile(new URI("blarg/blubb"));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
 		
 		//Testing directory read
+		System.out.println("Reading content of dir: 'blarg'");
 		try {
-			ArrayList<URI> filelist = handler.readDir(new URI("."));
+			ArrayList<URI> filelist = handler.readDir(new URI("blarg"));
 			for (Iterator<URI> it = filelist.iterator(); it.hasNext();) {
 				URI file = it.next();
 				if (file != null) {
@@ -47,7 +48,41 @@ public class TinFoilHat {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	
+		
+		System.out.println("Trying to delete dir: 'blarg'");
+		try {
+			handler.deleteDir(new URI("blarg"), false);
+		} catch (DirectoryNotEmptyException e)
+		{
+			System.out.println(e);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("Trying to delete file: 'blarg/blubb:'");
+		try {
+			handler.deleteFile(new URI("blarg/blubb"));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("Trying to delete dir: 'blarg' again");
+		try {
+			handler.deleteDir(new URI("blarg"), false);
+		} catch (DirectoryNotEmptyException e)
+		{
+			System.out.println(e);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
 	}
 	
 }

@@ -1,9 +1,10 @@
 package chemtrail;
 
 import java.io.*;
+import chemtrail.DirectoryNotEmptyException;
 import java.util.ArrayList;
 
-
+import org.gridlab.gat.io.File;
 import org.gridlab.gat.GAT;
 import org.gridlab.gat.GATContext;
 import org.gridlab.gat.GATObjectCreationException;
@@ -11,7 +12,7 @@ import org.gridlab.gat.Preferences;
 import org.gridlab.gat.URI;
 import org.gridlab.gat.security.CredentialSecurityContext;
 
-public class GAThandler implements gatfs {
+public class GAThandler implements Gatfs {
 
 	private byte[] proxyCredentialBytes = null;
 	private Preferences prefs = null;
@@ -38,7 +39,7 @@ public class GAThandler implements gatfs {
 	private byte[] readCertificate(String FileName) {
 		
 
-		File file = new File(FileName);
+		java.io.File file = new java.io.File(FileName);
 		StringBuffer contents = new StringBuffer();
 		BufferedReader reader = null;
 		
@@ -53,10 +54,8 @@ public class GAThandler implements gatfs {
 			
 		} catch (FileNotFoundException e) {
 			System.out.println("Could not read Certificate file. Is the path correct?");
-			//e.printStackTrace();
 		} catch (IOException e) {
 			System.out.println("Could not read Certificate file. Is the path correct?");
-			//e.printStackTrace();
 		} finally {
 			try {
 				if (reader != null) {
@@ -140,13 +139,27 @@ public class GAThandler implements gatfs {
 	 * @see chemtrail.gatfs#deleteDir(org.gridlab.gat.URI)
 	 */
 	@Override
-	public void deleteDir(URI DirName) throws Exception {
+	public void deleteDir(URI DirName, boolean recursive) throws Exception {
 		GATContext context = this.generateGATcontext();
 		try {
 			File file = GAT.createFile(context,DirName);
-			if(file.isDirectory() ) {
-				file.delete();
-				
+			if(!file.exists()) {
+				throw new FileNotFoundException();
+			}
+			else {
+				if(file.isDirectory()) { 
+					if (recursive) {
+						file.recursivelyDeleteDirectory();
+					}
+					else {
+						if(file.list().length == 0) {
+							file.delete();	
+						}
+						else {
+							throw new DirectoryNotEmptyException(file.getPath());
+						}
+					}
+				}
 			}
 		} catch (GATObjectCreationException e) {
 			e.printStackTrace();
@@ -159,8 +172,18 @@ public class GAThandler implements gatfs {
 	 */
 	@Override
 	public void deleteFile(URI FileName) throws Exception {
-		// TODO Auto-generated method stub
+		GATContext context = this.generateGATcontext();
 		
+		try {
+			File file = GAT.createFile(context,FileName);
+			if(!file.exists()) {
+				throw new FileNotFoundException();
+			}
+			file.delete();	
+		} catch (GATObjectCreationException e) {
+			e.printStackTrace();
+		}
+		GAT.end();	
 	}
 
 	/* (non-Javadoc)
@@ -187,21 +210,33 @@ public class GAThandler implements gatfs {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see chemtrail.gatfs#readFile(org.gridlab.gat.URI)
-	 */
-	@Override
-	public Object readFile(URI FileName) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/* (non-Javadoc)
 	 * @see chemtrail.gatfs#renameDir(org.gridlab.gat.URI, org.gridlab.gat.URI)
 	 */
 	@Override
 	public void renameDir(URI OldDirName, URI NewDirName) throws Exception {
-		// TODO Auto-generated method stub
+		GATContext context = this.generateGATcontext();
+		
+		try {
+			File oldFile = GAT.createFile(context,OldDirName);
+			if(!oldFile.exists()) {
+				throw new FileNotFoundException();
+			}
+			else {
+				//rename != move !!
+				if(oldFile.isDirectory() && OldDirName.getHost().equals(NewDirName.getHost()))
+				{
+					File newFile = GAT.createFile(context,NewDirName);
+					oldFile.renameTo(newFile);
+				}
+			}
+			
+		} catch (GATObjectCreationException e) {
+			e.printStackTrace();
+		}
+		GAT.end();	
+		
 		
 	}
 
@@ -210,15 +245,29 @@ public class GAThandler implements gatfs {
 	 */
 	@Override
 	public void renameFile(URI OldFileName, URI NewFileName) throws Exception {
+		GATContext context = this.generateGATcontext();
+		
+		try {
+			File file = GAT.createFile(context,OldFileName);
+			if(!file.exists()) {
+				throw new FileNotFoundException();
+			}
+			file.copy(NewFileName);	
+		} catch (GATObjectCreationException e) {
+			e.printStackTrace();
+		}
+		GAT.end();
+	}
+
+
+	@Override
+	public void readFile(URI FileName, InputStream Data) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see chemtrail.gatfs#updateFile(org.gridlab.gat.URI, java.lang.Object)
-	 */
 	@Override
-	public void updateFile(URI Filename, Object Data) throws Exception {
+	public void updateFile(URI Filename, InputStream Data) throws Exception {
 		// TODO Auto-generated method stub
 		
 	}
