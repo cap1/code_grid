@@ -1,22 +1,22 @@
 package chemtrail;
 
+import org.gridlab.gat.io.FileInputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 import org.gridlab.gat.URI;
 
-
-
 public interface Gatfs {
 	void createFile(URI FileName) throws Exception; //check
 	void createDir(URI DirName) throws Exception; //check 
-	//Lieber stream als parameter
-	void readFile(URI FileName, InputStream Data) throws Exception; 
 	ArrayList<URI> readDir(URI DirName) throws Exception; //check
-	void deleteFile(URI FileName) throws Exception;
-	void updateFile(URI Filename, InputStream Data) throws Exception;
-	void renameDir(URI OldDirName, URI NewDirName) throws Exception;
-	void renameFile(URI OldFileName, URI NewFileName) throws Exception;
-	void deleteDir(URI DirName, boolean recursive) throws Exception;
+	void deleteFile(URI FileName) throws Exception; //check
+	void updateFile(URI FileName, OutputStream data) throws Exception;
+	void readFile(URI FileName, FileInputStream Data) throws Exception; 
+	void deleteDir(URI DirName, boolean recursive) throws Exception; //check
+	void renameDir(URI OldDirName, URI NewDirName) throws Exception; //check
+	void renameFile(URI OldFileName, URI NewFileName) throws Exception; //check
+	
 	
 }

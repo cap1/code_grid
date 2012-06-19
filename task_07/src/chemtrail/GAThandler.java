@@ -5,6 +5,7 @@ import chemtrail.DirectoryNotEmptyException;
 import java.util.ArrayList;
 
 import org.gridlab.gat.io.File;
+import org.gridlab.gat.io.FileInputStream;
 import org.gridlab.gat.GAT;
 import org.gridlab.gat.GATContext;
 import org.gridlab.gat.GATObjectCreationException;
@@ -246,7 +247,6 @@ public class GAThandler implements Gatfs {
 	@Override
 	public void renameFile(URI OldFileName, URI NewFileName) throws Exception {
 		GATContext context = this.generateGATcontext();
-		
 		try {
 			File file = GAT.createFile(context,OldFileName);
 			if(!file.exists()) {
@@ -261,15 +261,27 @@ public class GAThandler implements Gatfs {
 
 
 	@Override
-	public void readFile(URI FileName, InputStream Data) throws Exception {
-		// TODO Auto-generated method stub
+	public void readFile(URI FileName, FileInputStream data) throws Exception {
+		GATContext context = this.generateGATcontext();
 		
+		try {
+			data = GAT.createFileInputStream(context, FileName);
+		} catch (GATObjectCreationException e) {
+			e.printStackTrace();
+		}
+		GAT.end();	
 	}
 
 	@Override
-	public void updateFile(URI Filename, InputStream Data) throws Exception {
-		// TODO Auto-generated method stub
+	public void updateFile(URI FileName, OutputStream data) throws Exception {
+		GATContext context = this.generateGATcontext();
 		
-	}
-
+		try {	
+			data = GAT.createFileOutputStream(context, FileName);
+			//TODO
+		} catch (GATObjectCreationException e) {
+			e.printStackTrace();
+		}
+//		GAT.end();	
+	}		
 }
