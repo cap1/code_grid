@@ -9,11 +9,12 @@ import org.gridlab.gat.URI;
 
 public interface Gatfs {
 	void createFile(URI FileName) throws Exception; //check
+	void createFile(URI FileName, InputStream data) throws Exception;
 	void createDir(URI DirName) throws Exception; //check 
 	ArrayList<URI> readDir(URI DirName) throws Exception; //check
 	void deleteFile(URI FileName) throws Exception; //check
-	void updateFile(URI FileName, OutputStream data) throws Exception;
-	void readFile(URI FileName, FileInputStream Data) throws Exception; 
+	void updateFile(URI FileName, InputStream data) throws Exception;
+	void readFile(URI FileName, OutputStream Data) throws Exception; 
 	void deleteDir(URI DirName, boolean recursive) throws Exception; //check
 	void renameDir(URI OldDirName, URI NewDirName) throws Exception; //check
 	void renameFile(URI OldFileName, URI NewFileName) throws Exception; //check
