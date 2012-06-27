@@ -53,8 +53,8 @@ public class TinFoilHat {
 		}
 		
 		try {
-			FileOutputStream data = null;
 			
+			InputStream data = null;
 			handler.updateFile(new URI("any://delhi/tmp/griduser9blarg/blubb"), data );
 			System.out.println("meh" + data);
 			
