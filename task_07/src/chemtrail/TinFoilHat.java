@@ -1,104 +1,141 @@
 package chemtrail;
 
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.gridlab.gat.URI;
-import org.gridlab.gat.io.FileInputStream;
-import org.gridlab.gat.io.FileOutputStream;
 
 import chemtrail.GAThandler;
 
 public class TinFoilHat {
 
-	public static void main(String args[]){
-		System.getProperties().setProperty("gat.adaptor.path", 
-											"resources/lib/adaptors");
+	public static void main(String args[]) {
+		System.getProperties().setProperty("gat.adaptor.path",
+				"resources/lib/adaptors");
+		// System.getProperties().setProperty("gat.adaptor.path",
+		// "/afs/informatik.uni-goettingen.de/user/r/ralph.krimmel/workspace/gruenewolken/src/resources/lib/adaptors");
+
 		System.getProperties().setProperty("log4j.rootLogger", "off");
+
+		GAThandler handler = new GAThandler("/tmp/x509up_u1013", "gridftp");
+
+		String host = "lima";
+		String adaptor = "gsiftp://";
 		
-		GAThandler handler = new GAThandler("cert.pem","gridftp");
+		// Testing creation of file with content
 		
-		
-		//Testing creation of a new, empty dir
-		System.out.println("Creating directory 'blarg'");
+
+		// Testing creation of a new, empty dir
 		try {
-			handler.createDir(new URI("any://delhi/tmp/griduser9blarg"));
+			handler.createDir(new URI(adaptor + host + "//tmp/griduser9blarg"));
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		//Testing creation of a new, empty file
-		System.out.println("Creating file 'blarg/blubb'");
+
+		// Testing creation of a new, empty file
 		try {
-			handler.createFile(new URI("any://delhi/tmp/griduser9blarg/blubb"));
+			handler.createFile(new URI(adaptor + host
+					+ "//tmp/griduser9blarg/blubb"));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+
+		// Testing creation of non empty file
+		PipedOutputStream pos = new PipedOutputStream();
+		PipedInputStream data;
+		try {
+			data = new PipedInputStream(pos);
+			byte[] b = "Toller Content einer Datei\n".getBytes();
+			pos.write(b, 0, b.length);
+			pos.close();
+			handler.createFile(new URI(adaptor + host
+					+ "//tmp/griduser9blarg/bla"), data);
+			data.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
 		
-		//Testing directory read
-		System.out.println("Reading content of dir: 'blarg'");
+		
+		// Testing directory read
 		try {
-			ArrayList<URI> filelist = handler.readDir(new URI("any://delhi/tmp/griduser9blarg"));
+			ArrayList<URI> filelist = handler.readDir(new URI(adaptor + host
+					+ "//tmp/griduser9blarg"));
 			for (Iterator<URI> it = filelist.iterator(); it.hasNext();) {
 				URI file = it.next();
 				if (file != null) {
-				System.out.println(file.getPath());
+					System.out.println(file.getPath());
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
+		//trying to read from file
 		try {
-			
-			InputStream data = null;
-			handler.updateFile(new URI("any://delhi/tmp/griduser9blarg/blubb"), data );
-			System.out.println("meh" + data);
-			
-			data.write(new String("foobar!").getBytes());
-			data.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+			handler.readFile(new URI(adaptor + host + "//tmp/griduser9blarg/bla"), System.out);
+		} catch (URISyntaxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 		
-		System.out.println("Trying to delete dir: 'blarg'");
+		//trying to update file
+		pos = new PipedOutputStream();
 		try {
-			handler.deleteDir(new URI("any://delhi/tmp/griduser9blarg"), false);
-		} catch (DirectoryNotEmptyException e)
-		{
-			System.out.println(e);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		System.out.println("Trying to delete file: 'any://delhi/tmp/griduser9blarg/blubb:'");
-		try {
-			handler.deleteFile(new URI("any://delhi/tmp/griduser9blarg/blubb"));
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		System.out.println("Trying to delete dir: 'any://delhi/tmp/griduser9blarg' again");
-		try {
-			handler.deleteDir(new URI("any://delhi/tmp/griduser9blarg"), false);
-		} catch (DirectoryNotEmptyException e)
-		{
-			System.out.println(e);
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		
-	}
-	
-}
+			data = new PipedInputStream(pos);
+			byte[] b = "bla".getBytes();
+			pos.write(b, 0, b.length);
+			pos.close();
+			handler.updateFile(new URI(adaptor + host + "//tmp/griduser9blarg/blubb"), data );
+		 } catch (Exception e) { 
+			 e.printStackTrace(); 
+		 }
 
+		
+		//try to delete directory with content
+		try {
+			handler.deleteDir(new URI(adaptor + host + "//tmp/griduser9blarg"),
+					false);
+		} catch (DirectoryNotEmptyException e) {
+			System.out.println(e);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		//try to delete file
+		try {
+			handler.deleteFile(new URI(adaptor + host
+					+ "//tmp/griduser9blarg/blubb"));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		//try to delete directory recursively
+		try {
+			handler.deleteDir(new URI(adaptor + host + "//tmp/griduser9blarg"),
+					true);
+		} catch (DirectoryNotEmptyException e) {
+			System.out.println(e);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+}
