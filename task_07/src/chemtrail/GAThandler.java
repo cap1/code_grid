@@ -72,7 +72,7 @@ public class GAThandler implements Gatfs {
 	 * 
 	 * @return number of bytes piped
 	 */
-	private static int pipeData(InputStream in, OutputStream out) throws IOException {
+	private int pipeData(InputStream in, OutputStream out) throws IOException {
 		int buffer = 0;
 		int bytecount = 0;
 		while ((buffer = in.read()) != -1) {
@@ -223,16 +223,16 @@ public class GAThandler implements Gatfs {
 	/**
 	 * Remove a directory.
 	 * 
-	 * @param DirName Path to the directory to remove
+	 * @param dirName Path to the directory to remove
 	 * @param recursive if true, behaves like "rm -r", otherwise like "rmdir"
 	 * 
 	 * @see chemtrail.gatfs#deleteDir(org.gridlab.gat.URI)
 	 */
-	public void deleteDir(URI DirName, boolean recursive) throws Exception {
-		if (verbose ) System.out.println("Trying to delete dir: " + DirName);
+	public void deleteDir(URI dirName, boolean recursive) throws FileNotFoundException,DirectoryNotEmptyException,Exception {
+		if (verbose ) System.out.println("Trying to delete dir: " + dirName);
 		GATContext context = this.generateGATcontext();
 		try {
-			File file = GAT.createFile(context, DirName);
+			File file = GAT.createFile(context, dirName);
 			if (!file.exists()) {
 				throw new FileNotFoundException();
 			} else {
@@ -452,7 +452,8 @@ public class GAThandler implements Gatfs {
 		GAT.end();
 	}
 
-	public long readSize(URI FileName) {
+
+	public String getBaseName(URI FileName) {
 		GATContext context = this.generateGATcontext();
 		 File file = null;
 		 try {
@@ -460,8 +461,63 @@ public class GAThandler implements Gatfs {
 			} catch (GATObjectCreationException e) {
 				e.printStackTrace();
 		}
+		String result = file.getName();
+		GAT.end();
+		return result;
+	}
+
+	public long getSize(URI FileName) {
+		GATContext context = this.generateGATcontext();
+		File file = null;
+		try {
+			file = GAT.createFile(context, FileName);
+			} catch (GATObjectCreationException e) {
+				e.printStackTrace();
+		}
 		long result = file.length();
 		GAT.end();
 		return result;
+	}
+
+	public boolean exists(URI path) {
+		GATContext context = this.generateGATcontext();
+		File file=null;
+		try {
+			file = GAT.createFile(context, path);
+			
+		} catch (GATObjectCreationException e) {
+		}
+		boolean result = file.exists();
+		GAT.end();
+		return result;
+	}
+
+	public void copyDir(URI FromDir, URI ToDir) throws Exception {
+		GATContext context = this.generateGATcontext();
+		 
+		try {
+				File dir = GAT.createFile(context, FromDir);
+				if (dir.isDirectory()) {
+					for (int i = 0; i < dir.list().length; i++) {
+						File child = GAT.createFile(context, dir.list()[i]);
+						if (child.isDirectory()) {
+							child.copy(ToDir);
+							copyDir(new URI(dir.list()[i]), new URI(ToDir + child.getName()));
+						}
+						else {
+							child.copy(new URI(ToDir + child.getName()));
+						}
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		GAT.end();
+		
+	}
+
+	public void moveDir(URI FromDir, URI ToDir) throws Exception {
+		copyDir(FromDir, ToDir);
+		deleteDir(FromDir, true);
 	}
 }
