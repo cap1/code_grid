@@ -117,13 +117,19 @@ public class GridFolderResource implements FolderResource {
 			for(Iterator<URI> it = content.iterator();it.hasNext();)
 			{
 				URI item = it.next();
-				if( gatfs.isDirectory(item)) {
-					GridFolderResource gfs = new GridFolderResource(gatfs,item);
+				
+				URI absoluteItem = new URI(this.dirName.toString() + item);
+				
+				if( gatfs.isDirectory(absoluteItem)) {
+					GridFolderResource gfs = new GridFolderResource(gatfs,absoluteItem);
 					result.add(gfs);
 				}
-				else if (gatfs.isFile(item)) {
-					GridFileResource gfs = new GridFileResource(gatfs,item);
+				else if (gatfs.isFile(absoluteItem)) {
+					GridFileResource gfs = new GridFileResource(gatfs,absoluteItem);
 					result.add(gfs);
+				}
+				else {
+						System.out.println("Problem with " + absoluteItem);
 				}
 			}
 		} catch (URISyntaxException e) {
@@ -141,7 +147,7 @@ public class GridFolderResource implements FolderResource {
 	 * @see com.bradmcevoy.http.Resource#getName()
 	 */
 	public String getName() {
-		return this.dirName.getPath();		
+		return gatfs.getBaseName(this.dirName);		
 	}
 
 	/*
@@ -160,7 +166,7 @@ public class GridFolderResource implements FolderResource {
 	 * CollectionResource, java.lang.String)
 	 */
 	public void copyTo(CollectionResource destination, String newName) {
-		// TODO: implement
+		
 		//throw new UnsupportedOperationException("not implemented yet");
 	}
 

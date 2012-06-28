@@ -16,7 +16,7 @@ public class MyResourceFactory implements ResourceFactory {
 	private GAThandler gatfs;
 	String protocol = "gsiftp://";
 	String gridhost = "lima";
-	
+
 	public MyResourceFactory() {
 		System.out.println("Setting up GAT handler");
 		gatfs = new GAThandler("/tmp/x509up_u1013", "gridftp");
@@ -31,25 +31,23 @@ public class MyResourceFactory implements ResourceFactory {
 	 */
 	public Resource getResource(String host, String path) {
 		System.out.println("Host " + host + " Path " + path);
-		
-		
+
 		URI target = null;
 		try {
 			target = new URI(protocol + gridhost + "/" + path);
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		}
-		
 		Resource gfs = null;
-		if(gatfs.isDirectory(target))
-		{
-			gfs = new GridFolderResource(gatfs,target);
-			
+		if (gatfs.exists(target)) {
+			if (gatfs.isDirectory(target)) {
+				gfs = new GridFolderResource(gatfs, target);
+
+			} else if (gatfs.isFile(target)) {
+				gfs = new GridFileResource(gatfs, target);
+			}
 		}
-		else {
-			gfs = new GridFileResource(gatfs,target);
-		}
-		
+
 		return gfs;
 	}
 

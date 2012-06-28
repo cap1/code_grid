@@ -48,7 +48,7 @@ public class GridFileResource implements FileResource {
 	 */
 	public String getName() {
 		if (verbose) System.out.println("Getting Name of file " + fileName);
-		return fileName.getPath();
+		return gatfs.getBaseName(this.fileName);
 	}
 
 	/*
@@ -124,7 +124,7 @@ public class GridFileResource implements FileResource {
 	 */
 	public Long getContentLength() {
 		if(verbose) System.out.println("Getting size of file " + this.fileName);
-		return gatfs.readSize(this.fileName);
+		return gatfs.getSize(this.fileName);
 	}
 
 	/*
@@ -137,8 +137,7 @@ public class GridFileResource implements FileResource {
 	public void sendContent(OutputStream out, Range arg1,
 			Map<String, String> arg2, String arg3) throws IOException,
 			NotAuthorizedException, BadRequestException {
-		// TODO: implement
-		//throw new UnsupportedOperationException("not implemented yet");
+		//gatfs.readFile(, data)
 	}
 
 	/*
