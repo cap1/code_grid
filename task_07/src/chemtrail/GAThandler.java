@@ -407,10 +407,11 @@ public class GAThandler implements Gatfs {
 		try {
 			file = GAT.createFile(context, DirName);
 		} catch (GATObjectCreationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return file.isDirectory();
+		boolean result = file.isDirectory(); 
+		GAT.end();
+		return result;
 	}
 
 	public boolean isFile(URI FileName) {
@@ -421,8 +422,46 @@ public class GAThandler implements Gatfs {
 			file = GAT.createFile(context, FileName);
 			
 		} catch (GATObjectCreationException e) {
-			// TODO Auto-generated catch block
 		}
-		return file.isFile();
+		boolean result = file.isFile();
+		GAT.end();
+		return result;
+	}
+
+	public void copyFile(URI FromFile, URI ToFile) throws Exception {
+		 GATContext context = this.generateGATcontext();
+		 File file = null;
+		 try {
+				file = GAT.createFile(context, FromFile);
+			} catch (GATObjectCreationException e) {
+				e.printStackTrace();
+		}
+		file.copy(ToFile);
+		GAT.end();
+	}
+
+	public void moveFile(URI FromFile, URI ToFile) throws Exception {
+		GATContext context = this.generateGATcontext();
+		 File file = null;
+		 try {
+				file = GAT.createFile(context, FromFile);
+			} catch (GATObjectCreationException e) {
+				e.printStackTrace();
+		}
+		file.move(ToFile);
+		GAT.end();
+	}
+
+	public long readSize(URI FileName) {
+		GATContext context = this.generateGATcontext();
+		 File file = null;
+		 try {
+				file = GAT.createFile(context, FileName);
+			} catch (GATObjectCreationException e) {
+				e.printStackTrace();
+		}
+		long result = file.length();
+		GAT.end();
+		return result;
 	}
 }

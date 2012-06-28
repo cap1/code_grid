@@ -24,7 +24,10 @@ public interface Gatfs {
 	void deleteDir(URI DirName, boolean recursive) throws Exception; //check
 	void renameDir(URI OldDirName, URI NewDirName) throws Exception; //check
 	void renameFile(URI OldFileName, URI NewFileName) throws Exception; //check
+	void copyFile(URI FromFile, URI ToFile) throws Exception;
+	void moveFile(URI FromFile, URI ToFile) throws Exception;
 	boolean isFile(URI FileName);
 	boolean isDirectory(URI DirName);
+	long readSize(URI FileName);
 	
 }

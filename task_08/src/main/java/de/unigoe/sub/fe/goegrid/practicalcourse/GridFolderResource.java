@@ -53,6 +53,7 @@ public class GridFolderResource implements FolderResource {
 			String type) throws IOException, ConflictException,
 			NotAuthorizedException, BadRequestException {
 		GridFolderResource result = null;
+		//TODO
 		try {
 			 result = new GridFolderResource(gatfs,new URI(name));
 			
@@ -126,10 +127,8 @@ public class GridFolderResource implements FolderResource {
 				}
 			}
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return result;

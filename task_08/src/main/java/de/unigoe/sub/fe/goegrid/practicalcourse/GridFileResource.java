@@ -2,6 +2,7 @@ package de.unigoe.sub.fe.goegrid.practicalcourse;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ public class GridFileResource implements FileResource {
 
 	URI fileName;
 	GAThandler gatfs;
+	private final static boolean verbose = true;
 
 	/**
    * 
@@ -35,6 +37,7 @@ public class GridFileResource implements FileResource {
 	GridFileResource(GAThandler gatfs, URI fileName) {
 		this.fileName = fileName;
 		this.gatfs = gatfs;
+		if(verbose) System.out.println("Creating File Resource: " + fileName);
 		
 	}
 
@@ -44,6 +47,7 @@ public class GridFileResource implements FileResource {
 	 * @see com.bradmcevoy.http.Resource#getName()
 	 */
 	public String getName() {
+		if (verbose) System.out.println("Getting Name of file " + fileName);
 		return fileName.getPath();
 	}
 
@@ -63,8 +67,18 @@ public class GridFileResource implements FileResource {
 	 * CollectionResource, java.lang.String)
 	 */
 	public void copyTo(CollectionResource destination, String newName) {
-		// TODO: implement
-		//throw new UnsupportedOperationException("not implemented yet");
+		URI source = null;
+ 		URI target = null;
+		if (verbose) System.out.println("Copy " + this.getName() + " to new Name: " +  newName);
+		try {
+			source = new URI(this.getName());
+			target = new URI(destination.getName());
+			gatfs.copyFile(source, target);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -75,8 +89,18 @@ public class GridFileResource implements FileResource {
 	 */
 	public void moveTo(CollectionResource destination, String newName)
 			throws ConflictException {
-		// TODO: implement
-		//throw new UnsupportedOperationException("not implemented yet");
+		URI source = null;
+ 		URI target = null;
+		if (verbose) System.out.println("Move " + this.getName() + " to new Name: " +  newName);
+		try {
+			source = new URI(this.getName());
+			target = new URI(destination.getName());
+			gatfs.moveFile(source, target);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/*
@@ -85,10 +109,10 @@ public class GridFileResource implements FileResource {
 	 * @see com.bradmcevoy.http.DeletableResource#delete()
 	 */
 	public void delete() throws ConflictException {
+		if(verbose) System.out.println("Deleting file " + this.fileName);
 		try {
 			gatfs.deleteFile(fileName);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -99,9 +123,8 @@ public class GridFileResource implements FileResource {
 	 * @see com.bradmcevoy.http.GetableResource#getContentLength()
 	 */
 	public Long getContentLength() {
-		// TODO: implement
-		//throw new UnsupportedOperationException("not implemented yet");
-		return (long) 0;
+		if(verbose) System.out.println("Getting size of file " + this.fileName);
+		return gatfs.readSize(this.fileName);
 	}
 
 	/*

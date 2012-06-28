@@ -31,14 +31,26 @@ public class MyResourceFactory implements ResourceFactory {
 	 */
 	public Resource getResource(String host, String path) {
 		System.out.println("Host " + host + " Path " + path);
+		
+		
+		URI target = null;
 		try {
-			GridFolderResource gfs = new GridFolderResource(gatfs,new URI(protocol + gridhost + "/" + path));
-			return gfs;
-		} catch (URISyntaxException e) {
-	
-			e.printStackTrace();
+			target = new URI(protocol + gridhost + "/" + path);
+		} catch (URISyntaxException e1) {
+			e1.printStackTrace();
 		}
-		return null;
+		
+		Resource gfs = null;
+		if(gatfs.isDirectory(target))
+		{
+			gfs = new GridFolderResource(gatfs,target);
+			
+		}
+		else {
+			gfs = new GridFileResource(gatfs,target);
+		}
+		
+		return gfs;
 	}
 
 }
