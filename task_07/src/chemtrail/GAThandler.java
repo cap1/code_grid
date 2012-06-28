@@ -399,4 +399,30 @@ public class GAThandler implements Gatfs {
 		deleteFile(FileName);
 		createFile(FileName, data);
 	}
+
+	public boolean isDirectory(URI DirName) {
+		GATContext context = this.generateGATcontext();
+		File file = null;
+		
+		try {
+			file = GAT.createFile(context, DirName);
+		} catch (GATObjectCreationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return file.isDirectory();
+	}
+
+	public boolean isFile(URI FileName) {
+	
+		GATContext context = this.generateGATcontext();
+		File file=null;
+		try {
+			file = GAT.createFile(context, FileName);
+			
+		} catch (GATObjectCreationException e) {
+			// TODO Auto-generated catch block
+		}
+		return file.isFile();
+	}
 }
