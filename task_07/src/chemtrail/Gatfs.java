@@ -7,6 +7,12 @@ import java.util.ArrayList;
 
 import org.gridlab.gat.URI;
 
+
+/**
+ * Interface to communicate with JavaGAT.
+ * @author ralph.krimmel, christian.mueller6
+ *
+ */
 public interface Gatfs {
 	void createFile(URI FileName) throws Exception; //check
 	void createFile(URI FileName, InputStream data) throws Exception;
@@ -18,6 +24,4 @@ public interface Gatfs {
 	void deleteDir(URI DirName, boolean recursive) throws Exception; //check
 	void renameDir(URI OldDirName, URI NewDirName) throws Exception; //check
 	void renameFile(URI OldFileName, URI NewFileName) throws Exception; //check
-	
-	
 }

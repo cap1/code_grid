@@ -1,6 +1,5 @@
 package chemtrail;
 
-
 import chemtrail.DirectoryNotEmptyException;
 
 
@@ -19,38 +18,42 @@ import org.gridlab.gat.Preferences;
 import org.gridlab.gat.URI;
 import org.gridlab.gat.security.CredentialSecurityContext;
 
+/**
+ * Implements file and folder operations using JavaGAT by implementing Gatfs.
+ * 
+ * @author ralph.krimmel, christian.mueller6
+ */
+
 public class GAThandler implements Gatfs {
 
+	//bytefield to handle the proxycertificate
 	private byte[] proxyCredentialBytes = null;
+	
+	//preference object for the GAThandler
 	private Preferences prefs = null;
+	
+	//enable verbose output during operations on System.out
 	private final static boolean verbose = true;
 
-	public GAThandler() {
-		// set proxy credential bytes here
-
-		Preferences prefs = new Preferences();
-		prefs.put("File.adaptor.name", "gridftp");
-
-	} 
-	
-	/**
-	 * @return the verbose
-	 */
-	public static boolean isVerbose() {
-		return verbose;
-	}
 
 	public GAThandler(String certFileName, String adaptorname) {
 		Preferences prefs = new Preferences();
 		prefs.put("File.adaptor.name", adaptorname);
 		this.proxyCredentialBytes = readCertificate(certFileName);
-
 	}
 
 	// reads the certificate file and returns it as byte datastream
+	
+	
+	/**
+	 * Read the proxy-certificate from the File to a byte field.
+	 * JavaGat requires the certificate as a byte[] format
+	 * 
+	 * @param FileName Path to the certificate to read from
+	 * 
+	 * @return byte[] with the contents of FileName
+	 */
 	private byte[] readCertificate(String FileName) {
-
-		
 		java.io.File file = new java.io.File(FileName);
 		try {
 			java.io.FileInputStream  proxyFileReader = new java.io.FileInputStream(file);
@@ -64,13 +67,19 @@ public class GAThandler implements Gatfs {
 			e.printStackTrace();
 		}
 		return proxyCredentialBytes;
-		 
 	}
 
-	
-
-	private static int pipeData(InputStream in, OutputStream out)
-			throws IOException {
+	/**
+	 * Pipes data from the in to out.
+	 * Reads data from the InputStream and writes it to the output 
+	 * and counts the bytes piped.
+	 *  
+	 * @param in InputStream to read from
+	 * @param out OutputStream to write to
+	 * 
+	 * @return number of bytes piped
+	 */
+	private static int pipeData(InputStream in, OutputStream out) throws IOException {
 		int buffer = 0;
 		int bytecount = 0;
 		while ((buffer = in.read()) != -1) {
@@ -80,18 +89,34 @@ public class GAThandler implements Gatfs {
 		return bytecount;
 	}
 
+	/**
+	 * Gets the proxy certificate as a byte[].
+	 * @return proxycertificate as byte[]
+	 */
 	public byte[] getProxyCredentialBytes() {
 		return proxyCredentialBytes;
 	}
 
+	/**
+	 * Sets the proxy certificate.
+	 * @param proxyCredentialBytes proxy certificate as byte[]
+	 */
 	public void setProxyCredentialBytes(byte[] proxyCredentialBytes) {
 		this.proxyCredentialBytes = proxyCredentialBytes;
 	}
 
+	/**
+	 * Gets the name of the Adaptor as defined in the "File.adaptor.name".
+	 * @return String containing the current adaptor name
+	 */
 	public String getAdaptorname() {
 		return (String) this.prefs.get("File.adaptor.name");
 	}
 
+	/**
+	 * Sets the "File.adaptor.name" in the Preferences object.
+	 * @param adaptorname name of the adaptor to use
+	 */
 	public void setAdaptorname(String adaptorname) {
 		this.prefs.put("File.adaptor.name", adaptorname);
 	}
