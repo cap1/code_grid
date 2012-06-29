@@ -39,7 +39,6 @@ public class GridFolderResource implements FolderResource {
 	//determine if verbose output is desired
 	private static final boolean verbose = true;
 	
-
 	/**
 	 * Construct a new Folder Ressource on the Grid
 	 * 
@@ -50,14 +49,13 @@ public class GridFolderResource implements FolderResource {
 		this.dirName = dirName;
 		this.gatfs = gatfs;
 		if(verbose) System.out.println("Creating Folder Resource: " + dirName);
-		
 	}
 
 	/**
 	 * Create a new GridFolderRessource.
 	 * 
-	 * @param name
-	 * @param content
+	 * @param name name of the new resource
+	 * @param content 
 	 * @param length
 	 * @param type
 	 * 
@@ -159,8 +157,7 @@ public class GridFolderResource implements FolderResource {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return result;
-		
+		return result;		
 	}
 
 	/**
@@ -174,8 +171,10 @@ public class GridFolderResource implements FolderResource {
 		return gatfs.getBaseName(this.dirName);		
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the unique ID of the resource
+	 * 
+	 * @return the unique ID of the resource, described by the path.
 	 * 
 	 * @see com.bradmcevoy.http.Resource#getUniqueId()
 	 */
@@ -223,6 +222,7 @@ public class GridFolderResource implements FolderResource {
 	}
 
 	/*
+	 * 
 	 * (non-Javadoc)
 	 * 
 	 * @see com.bradmcevoy.http.GetableResource#getContentLength()
@@ -234,7 +234,7 @@ public class GridFolderResource implements FolderResource {
 	/** 
 	 * Return the MIME-Type of the GridFolderResource.
 	 * 
-	 * @return !not implemented, returning always "text/html"
+	 * @return not implemented, returning always "text/html"
 	 * 
 	 * @see com.bradmcevoy.http.GetableResource#getContentType(java.lang.String)
 	 */
@@ -322,5 +322,4 @@ public class GridFolderResource implements FolderResource {
 	public String checkRedirect(Request arg0) {
 		return null;
 	}
-
 }

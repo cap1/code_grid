@@ -20,11 +20,15 @@ public class MyResourceFactory implements ResourceFactory {
 	public MyResourceFactory() {
 		System.out.println("Setting up GAT handler");
 		gatfs = new GAThandler("/tmp/x509up_u1013", "gridftp");
-
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get a new Gridresource.
+	 * 
+	 * @param host host of the requested resource
+	 * @param path path to the requested resource
+	 * 
+	 * @return the resource described by the parameters.
 	 * 
 	 * @see com.bradmcevoy.http.ResourceFactory#getResource(java.lang.String,
 	 * java.lang.String)
