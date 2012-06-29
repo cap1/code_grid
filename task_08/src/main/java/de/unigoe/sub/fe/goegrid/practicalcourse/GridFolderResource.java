@@ -163,8 +163,10 @@ public class GridFolderResource implements FolderResource {
 		
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the basename of the Directory.
+	 * 
+	 * @return basename of the Directory
 	 * 
 	 * @see com.bradmcevoy.http.Resource#getName()
 	 */
@@ -181,20 +183,26 @@ public class GridFolderResource implements FolderResource {
 		return this.dirName.getPath();	
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Copy the directory to a another directory and change its name.
+	 * 
+	 * @param destination New path for the directory
+	 * @param new name of the directory
 	 * 
 	 * @seecom.bradmcevoy.http.CopyableResource#copyTo(com.bradmcevoy.http.
 	 * CollectionResource, java.lang.String)
 	 */
 	public void copyTo(CollectionResource destination, String newName) {
-		
+		//TODO: implement
 		//throw new UnsupportedOperationException("not implemented yet");
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Move the directory to a another directory and change its name.
 	 * 
+	 * @param destination New path for the directory
+	 * @param new name of the directory
+	 *  
 	 * @seecom.bradmcevoy.http.MoveableResource#moveTo(com.bradmcevoy.http.
 	 * CollectionResource, java.lang.String)
 	 */
@@ -204,8 +212,8 @@ public class GridFolderResource implements FolderResource {
 		//throw new UnsupportedOperationException("not implemented yet");
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Delete the directory.
 	 * 
 	 * @see com.bradmcevoy.http.DeletableResource#delete()
 	 */
@@ -223,8 +231,10 @@ public class GridFolderResource implements FolderResource {
 		return 0l;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/** 
+	 * Return the MIME-Type of the GridFolderResource.
+	 * 
+	 * @return !not implemented, returning always "text/html"
 	 * 
 	 * @see com.bradmcevoy.http.GetableResource#getContentType(java.lang.String)
 	 */
