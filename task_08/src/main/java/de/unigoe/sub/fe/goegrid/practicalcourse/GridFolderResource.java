@@ -26,16 +26,26 @@ import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
- *
+ * Represents a Folder in a Grid.
+ * 
+ * @author ralph.krimmel, christian.mueller
  */
 public class GridFolderResource implements FolderResource {
 	
+	//path to the directory
 	URI dirName;
+	//handler to communicate with JavaGAT
 	GAThandler gatfs;
+	//determine if verbose output is desired
 	private static final boolean verbose = true;
+	
+
 	/**
-   * 
-   */
+	 * Construct a new Folder Ressource on the Grid
+	 * 
+	 * @param gatfs JavaGAT handler to communicate with the grid
+	 * @param dirName Path to the directory to work with
+	 */
 	GridFolderResource(	GAThandler gatfs, URI dirName) {
 		this.dirName = dirName;
 		this.gatfs = gatfs;
@@ -43,8 +53,13 @@ public class GridFolderResource implements FolderResource {
 		
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Create a new GridFolderRessource.
+	 * 
+	 * @param name
+	 * @param content
+	 * @param length
+	 * @param type
 	 * 
 	 * @see com.bradmcevoy.http.PutableResource#createNew(java.lang.String,
 	 * java.io.InputStream, java.lang.Long, java.lang.String)
@@ -63,11 +78,12 @@ public class GridFolderResource implements FolderResource {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Create a new Directory.
 	 * 
-	 * @see
-	 * com.bradmcevoy.http.MakeCollectionableResource#createCollection(java.
+	 * @param name Name of the new Directory
+	 * 
+	 * @see com.bradmcevoy.http.MakeCollectionableResource#createCollection(java.
 	 * lang.String)
 	 */
 	public CollectionResource createCollection(String name)
@@ -79,9 +95,12 @@ public class GridFolderResource implements FolderResource {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
+	 * Get the resource described by the given name.
+	 *
+	 * @param name name of the resource to obtain
+	 * @return the resource described by the given name. 
+	 *  
 	 * @see com.bradmcevoy.http.CollectionResource#child(java.lang.String)
 	 */
 	public Resource child(String name) {
@@ -92,6 +111,7 @@ public class GridFolderResource implements FolderResource {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
+		//check if file or directory
 		if( gatfs.isDirectory(item)) {
 			GridFolderResource gfs = new GridFolderResource(gatfs,item);
 			return gfs;
@@ -102,8 +122,10 @@ public class GridFolderResource implements FolderResource {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Returns a list of all children in the GridfolderResource.
+	 * 
+	 * @return List of the Children.
 	 * 
 	 * @see com.bradmcevoy.http.CollectionResource#getChildren()
 	 */
