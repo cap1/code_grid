@@ -19,10 +19,20 @@ import sun.misc.BASE64Encoder;
 //import org.apache.commons.codec.DecoderException; 
 
 public class PidClient {
-	static final String serviceUser = "griduser9";
-	static final String servicePwd = "doLhj10En4";
+	static String serviceUser = "griduser9";
+	static String servicePwd = "doLhj10En4";
 
 	public static void main(String[] args) throws Exception {
+		//check for PID
+		if (args.length == 1) {
+			searchPid(args[0]);
+		}
+		else if (args.length == 3) {
+			
+		}
+
+
+
 		//String pid = "11858/00-ZZZZ-0000-0000-0229-F";
 		//String pid = "11858/00-ZZZZ-0000-0001-4743-4";
 		String pid = "11858/00-STUD-0000-0000-13D9-3"; //christians own CID
