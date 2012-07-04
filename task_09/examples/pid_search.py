@@ -1,9 +1,9 @@
-import httplib2, pprint, urllib
+import httplib2, pprint, urllib,sys
 
-def args():    
+def args():
     for arg in sys.argv:
         print sys.argv[0]
-        
+
         try: 
             print sys.argv[1]
             generate_dir_md5(sys.argv[1])
