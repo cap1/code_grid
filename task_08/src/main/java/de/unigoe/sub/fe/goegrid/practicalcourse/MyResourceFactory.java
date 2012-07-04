@@ -20,6 +20,9 @@ public class MyResourceFactory implements ResourceFactory {
 	public MyResourceFactory() {
 		System.out.println("Setting up GAT handler");
 		gatfs = new GAThandler("/tmp/x509up_u1013", "gridftp");
+		if (gatfs != null) {
+			System.out.println("GAT handler running");
+		}
 
 	}
 

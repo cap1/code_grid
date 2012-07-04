@@ -96,10 +96,11 @@ public class GridFolderResource implements FolderResource {
 			GridFolderResource gfs = new GridFolderResource(gatfs,item);
 			return gfs;
 		}
-		else {
+		else if(gatfs.isFile(item)){
 			GridFileResource gfs = new GridFileResource(gatfs,item);
 			return gfs;
 		}
+		return null;
 	}
 
 	/*

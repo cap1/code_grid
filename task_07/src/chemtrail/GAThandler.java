@@ -294,6 +294,7 @@ public class GAThandler implements Gatfs {
 		try {
 			File dir = GAT.createFile(context, DirName);
 			if (dir.isDirectory()) {
+				
 				for (int i = 0; i < dir.list().length; i++) {
 					result.add(new URI(dir.list()[i]));
 					if (verbose) System.out.println(dir.list()[i]);
