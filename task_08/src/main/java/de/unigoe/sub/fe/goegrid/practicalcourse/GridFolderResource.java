@@ -26,25 +26,38 @@ import com.bradmcevoy.http.exceptions.ConflictException;
 import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 
 /**
- *
+ * Represents a Folder in a Grid.
+ * 
+ * @author ralph.krimmel, christian.mueller
  */
 public class GridFolderResource implements FolderResource {
 	
+	//path to the directory
 	URI dirName;
+	//handler to communicate with JavaGAT
 	GAThandler gatfs;
+	//determine if verbose output is desired
 	private static final boolean verbose = true;
+	
 	/**
-   * 
-   */
+	 * Construct a new Folder Ressource on the Grid
+	 * 
+	 * @param gatfs JavaGAT handler to communicate with the grid
+	 * @param dirName Path to the directory to work with
+	 */
 	GridFolderResource(	GAThandler gatfs, URI dirName) {
 		this.dirName = dirName;
 		this.gatfs = gatfs;
 		if(verbose) System.out.println("Creating Folder Resource: " + dirName);
-		
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Create a new GridFolderRessource.
+	 * 
+	 * @param name name of the new resource
+	 * @param content 
+	 * @param length
+	 * @param type
 	 * 
 	 * @see com.bradmcevoy.http.PutableResource#createNew(java.lang.String,
 	 * java.io.InputStream, java.lang.Long, java.lang.String)
@@ -63,11 +76,12 @@ public class GridFolderResource implements FolderResource {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Create a new Directory.
 	 * 
-	 * @see
-	 * com.bradmcevoy.http.MakeCollectionableResource#createCollection(java.
+	 * @param name Name of the new Directory
+	 * 
+	 * @see com.bradmcevoy.http.MakeCollectionableResource#createCollection(java.
 	 * lang.String)
 	 */
 	public CollectionResource createCollection(String name)
@@ -79,9 +93,12 @@ public class GridFolderResource implements FolderResource {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
+	 * Get the resource described by the given name.
+	 *
+	 * @param name name of the resource to obtain
+	 * @return the resource described by the given name. 
+	 *  
 	 * @see com.bradmcevoy.http.CollectionResource#child(java.lang.String)
 	 */
 	public Resource child(String name) {
@@ -92,6 +109,7 @@ public class GridFolderResource implements FolderResource {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
+		//check if file or directory
 		if( gatfs.isDirectory(item)) {
 			GridFolderResource gfs = new GridFolderResource(gatfs,item);
 			return gfs;
@@ -102,8 +120,10 @@ public class GridFolderResource implements FolderResource {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Returns a list of all children in the GridfolderResource.
+	 * 
+	 * @return List of the Children.
 	 * 
 	 * @see com.bradmcevoy.http.CollectionResource#getChildren()
 	 */
@@ -137,12 +157,13 @@ public class GridFolderResource implements FolderResource {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return result;
-		
+		return result;		
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the basename of the Directory.
+	 * 
+	 * @return basename of the Directory
 	 * 
 	 * @see com.bradmcevoy.http.Resource#getName()
 	 */
@@ -150,8 +171,10 @@ public class GridFolderResource implements FolderResource {
 		return gatfs.getBaseName(this.dirName);		
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the unique ID of the resource
+	 * 
+	 * @return the unique ID of the resource, described by the path.
 	 * 
 	 * @see com.bradmcevoy.http.Resource#getUniqueId()
 	 */
@@ -159,20 +182,26 @@ public class GridFolderResource implements FolderResource {
 		return this.dirName.getPath();	
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Copy the directory to a another directory and change its name.
+	 * 
+	 * @param destination New path for the directory
+	 * @param new name of the directory
 	 * 
 	 * @seecom.bradmcevoy.http.CopyableResource#copyTo(com.bradmcevoy.http.
 	 * CollectionResource, java.lang.String)
 	 */
 	public void copyTo(CollectionResource destination, String newName) {
-		
+		//TODO: implement
 		//throw new UnsupportedOperationException("not implemented yet");
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Move the directory to a another directory and change its name.
 	 * 
+	 * @param destination New path for the directory
+	 * @param new name of the directory
+	 *  
 	 * @seecom.bradmcevoy.http.MoveableResource#moveTo(com.bradmcevoy.http.
 	 * CollectionResource, java.lang.String)
 	 */
@@ -182,8 +211,8 @@ public class GridFolderResource implements FolderResource {
 		//throw new UnsupportedOperationException("not implemented yet");
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Delete the directory.
 	 * 
 	 * @see com.bradmcevoy.http.DeletableResource#delete()
 	 */
@@ -193,6 +222,7 @@ public class GridFolderResource implements FolderResource {
 	}
 
 	/*
+	 * 
 	 * (non-Javadoc)
 	 * 
 	 * @see com.bradmcevoy.http.GetableResource#getContentLength()
@@ -201,8 +231,10 @@ public class GridFolderResource implements FolderResource {
 		return 0l;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/** 
+	 * Return the MIME-Type of the GridFolderResource.
+	 * 
+	 * @return not implemented, returning always "text/html"
 	 * 
 	 * @see com.bradmcevoy.http.GetableResource#getContentType(java.lang.String)
 	 */
@@ -290,5 +322,4 @@ public class GridFolderResource implements FolderResource {
 	public String checkRedirect(Request arg0) {
 		return null;
 	}
-
 }
