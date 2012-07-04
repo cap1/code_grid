@@ -3,7 +3,6 @@ package de.unigoe.sub.fe.goegrid.practicalcourse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.nio.channels.GatheringByteChannel;
 import java.util.Date;
 import java.util.Map;
 
@@ -46,7 +45,7 @@ public class GridFileResource implements FileResource {
 	GridFileResource(GAThandler gatfs, URI fileName) {
 		this.fileName = fileName;
 		this.gatfs = gatfs;
-		if(verbose) System.out.println("Creating File Resource: " + fileName);		
+		//if(verbose) System.out.println("Creating File Resource: " + fileName);		
 	}
 
 	/**
@@ -57,7 +56,7 @@ public class GridFileResource implements FileResource {
 	 * @see com.bradmcevoy.http.Resource#getName()
 	 */
 	public String getName() {
-		if (verbose) System.out.println("Getting Name of file " + fileName);
+		//if (verbose) System.out.println("Getting Name of file " + fileName);
 		return gatfs.getBaseName(this.fileName);
 	}
 
@@ -82,13 +81,11 @@ public class GridFileResource implements FileResource {
 	 * CollectionResource, java.lang.String)
 	 */
 	public void copyTo(CollectionResource destination, String newName) {
-		URI source = null;
  		URI target = null;
-		if (verbose) System.out.println("Copy " + this.getName() + " to new Name: " +  newName);
+		if (verbose) System.out.println("Copy " + this.getName() + " to new collectionResource: " +  ((GridFolderResource) destination).getURI() +" New name " +  newName);
 		try {
-			source = new URI(this.getName());
-			target = new URI(destination.getName());
-			gatfs.copyFile(source, target);
+			target = new URI(((GridFolderResource) destination).getURI().toString() + "/" + newName);
+			gatfs.copyFile(fileName, target);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -107,13 +104,11 @@ public class GridFileResource implements FileResource {
 	 */
 	public void moveTo(CollectionResource destination, String newName)
 			throws ConflictException {
-		URI source = null;
  		URI target = null;
-		if (verbose) System.out.println("Move " + this.getName() + " to new Name: " +  newName);
+		if (verbose) System.out.println("Move " + fileName + " to new collectionResource: " +  ((GridFolderResource) destination).getURI() +" New name " +  newName);
 		try {
-			source = new URI(this.getName());
-			target = new URI(destination.getName());
-			gatfs.moveFile(source, target);
+			target = new URI(((GridFolderResource) destination).getURI().toString() + "/" + newName);
+			gatfs.moveFile(fileName, target);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -130,7 +125,6 @@ public class GridFileResource implements FileResource {
 		if(verbose) System.out.println("Deleting file " + this.fileName);
 		try {
 			gatfs.deleteFile(fileName);
-			//TODO: ConflictException
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -158,7 +152,7 @@ public class GridFileResource implements FileResource {
 	public void sendContent(OutputStream out, Range arg1,
 			Map<String, String> arg2, String arg3) throws IOException,
 			NotAuthorizedException, BadRequestException {
-		//gatfs.readFile(, data)
+		//gatfs.readFile(, data) //TODO
 	}
 
 	/** 

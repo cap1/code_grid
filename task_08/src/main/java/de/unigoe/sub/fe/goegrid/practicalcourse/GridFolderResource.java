@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.gridlab.gat.URI;
 
+import chemtrail.FileExistsException;
 import chemtrail.GAThandler;
 
 import com.bradmcevoy.http.Auth;
@@ -65,10 +66,13 @@ public class GridFolderResource implements FolderResource {
 	public Resource createNew(String name, InputStream content, Long length,
 			String type) throws IOException, ConflictException,
 			NotAuthorizedException, BadRequestException {
-		GridFolderResource result = null;
-		//TODO
+		GridFileResource result = null;
+		//System.out.println("GridFolderResource.createNew was called with parameters Name: "+ name + " InputStream " + content + " length " + length + " Type " + type);
 		try {
-			 result = new GridFolderResource(gatfs,new URI(name));
+			 URI fileURI = new URI(dirName + "/" + name);
+	
+			 gatfs.createFile(fileURI, content);
+			 result = new GridFileResource(gatfs,fileURI);
 			
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -87,9 +91,23 @@ public class GridFolderResource implements FolderResource {
 	public CollectionResource createCollection(String name)
 			throws NotAuthorizedException, ConflictException,
 			BadRequestException {
-		// TODO: implement
-		//throw new UnsupportedOperationException("not implemented yet");
-		CollectionResource result = null;
+		GridFolderResource result = null;
+		//System.out.println("GridFolderResource.createNew was called with parameters Name: "+ name + " InputStream " + content + " length " + length + " Type " + type);
+		try {
+			 URI folderURI = new URI(dirName + "/" + name);
+	
+			 gatfs.createDir(folderURI);
+			 result = new GridFolderResource(gatfs,folderURI);
+			
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
+
+		System.out.println("GridFolderresource.createColletion called with parameters Name: " + name);
 		return result;
 	}
 
@@ -171,6 +189,10 @@ public class GridFolderResource implements FolderResource {
 	public String getName() {
 		return gatfs.getBaseName(this.dirName);		
 	}
+	
+	public URI getURI() {
+		return this.dirName;
+	}
 
 	/**
 	 * Get the unique ID of the resource
@@ -193,8 +215,17 @@ public class GridFolderResource implements FolderResource {
 	 * CollectionResource, java.lang.String)
 	 */
 	public void copyTo(CollectionResource destination, String newName) {
-		//TODO: implement
-		//throw new UnsupportedOperationException("not implemented yet");
+		URI target = null;
+		if (verbose) System.out.println("Copy " + this.getName() + " to new collectionResource: " +  ((GridFolderResource) destination).getURI() +"/" +  newName);
+		try {
+			target = new URI(((GridFolderResource) destination).getURI().toString() + "/" + newName);
+			gatfs.copyDir(dirName, target);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	
 	}
 
 	/**
@@ -208,8 +239,17 @@ public class GridFolderResource implements FolderResource {
 	 */
 	public void moveTo(CollectionResource destination, String newName)
 			throws ConflictException {
-		// TODO: implement
-		//throw new UnsupportedOperationException("not implemented yet");
+		URI target = null;
+		if (verbose) System.out.println("Move " + dirName + " to new collectionResource: " +  ((GridFolderResource) destination).getURI() +"/" +  newName);
+		try {
+			target = new URI(((GridFolderResource) destination).getURI().toString() + "/" + newName);
+			gatfs.moveDir(dirName, target);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (FileExistsException e) {	
+			System.out.println(e);
+			throw new ConflictException(destination);
+		}
 	}
 
 	/**
@@ -218,8 +258,14 @@ public class GridFolderResource implements FolderResource {
 	 * @see com.bradmcevoy.http.DeletableResource#delete()
 	 */
 	public void delete() throws ConflictException {
-		// TODO: implement
-		//throw new UnsupportedOperationException("not implemented yet");
+		
+		if(verbose) System.out.println("Deleting file " + this.dirName);
+		try {
+			gatfs.deleteDir(dirName,true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	/*

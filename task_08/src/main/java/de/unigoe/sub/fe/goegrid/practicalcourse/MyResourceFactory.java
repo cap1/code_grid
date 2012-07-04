@@ -54,6 +54,9 @@ public class MyResourceFactory implements ResourceFactory {
 				gfs = new GridFileResource(gatfs, target);
 			}
 		}
+		else {
+			System.out.println("RESOURCEFACTORY: Requested file \""+target+"\" does not exist");
+		}
 
 		return gfs;
 	}
