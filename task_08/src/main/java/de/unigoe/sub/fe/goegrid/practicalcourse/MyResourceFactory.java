@@ -23,11 +23,15 @@ public class MyResourceFactory implements ResourceFactory {
 		if (gatfs != null) {
 			System.out.println("GAT handler running");
 		}
-
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get a new Gridresource.
+	 * 
+	 * @param host host of the requested resource
+	 * @param path path to the requested resource
+	 * 
+	 * @return the resource described by the parameters.
 	 * 
 	 * @see com.bradmcevoy.http.ResourceFactory#getResource(java.lang.String,
 	 * java.lang.String)

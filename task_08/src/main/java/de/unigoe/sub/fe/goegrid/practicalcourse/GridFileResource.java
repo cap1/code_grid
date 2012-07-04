@@ -3,6 +3,7 @@ package de.unigoe.sub.fe.goegrid.practicalcourse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
+import java.nio.channels.GatheringByteChannel;
 import java.util.Date;
 import java.util.Map;
 
@@ -22,27 +23,36 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
 import chemtrail.GAThandler;
 
 /**
- *
+ * Represents a File in the Grid.
+ * 
+ * @author ralph.krimmel, christian.mueller6
  */
+
 public class GridFileResource implements FileResource {
-
-
+	
+	//Path to the represented file
 	URI fileName;
+	//Handler to communicate with the JavaGAT
 	GAThandler gatfs;
+	//determine if verbose output is desired
 	private final static boolean verbose = true;
 
 	/**
-   * 
-   */
+	 * Construct a new file resource.
+	 * 
+	 * @param gatfs Handler to communicate with JavaGAT
+	 * @param fileName Basename of the file
+	 */
 	GridFileResource(GAThandler gatfs, URI fileName) {
 		this.fileName = fileName;
 		this.gatfs = gatfs;
-		if(verbose) System.out.println("Creating File Resource: " + fileName);
-		
+		if(verbose) System.out.println("Creating File Resource: " + fileName);		
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the basename of the file.
+	 * 
+	 * @return basename of the file.
 	 * 
 	 * @see com.bradmcevoy.http.Resource#getName()
 	 */
@@ -51,8 +61,10 @@ public class GridFileResource implements FileResource {
 		return gatfs.getBaseName(this.fileName);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the unique ID of the resource.
+	 * 
+	 * @return unique ID of the resource, describend by the path.
 	 * 
 	 * @see com.bradmcevoy.http.Resource#getUniqueId()
 	 */
@@ -60,8 +72,11 @@ public class GridFileResource implements FileResource {
 		return fileName.getPath();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Copy this file to the destination under the given name.
+	 * 
+	 * @param destination the path to the copy of the resource
+	 * @param newName the name of the copy
 	 * 
 	 * @seecom.bradmcevoy.http.CopyableResource#copyTo(com.bradmcevoy.http.
 	 * CollectionResource, java.lang.String)
@@ -81,8 +96,11 @@ public class GridFileResource implements FileResource {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Move the file to the destination with the given name.
+	 * NOT transaction safe, as the GATHandler implements it by copy and delete.
+	 * 
+	 * @see chemtrail.GATHandler
 	 * 
 	 * @seecom.bradmcevoy.http.MoveableResource#moveTo(com.bradmcevoy.http.
 	 * CollectionResource, java.lang.String)
@@ -103,8 +121,8 @@ public class GridFileResource implements FileResource {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Deletes the resource.
 	 * 
 	 * @see com.bradmcevoy.http.DeletableResource#delete()
 	 */
@@ -112,13 +130,16 @@ public class GridFileResource implements FileResource {
 		if(verbose) System.out.println("Deleting file " + this.fileName);
 		try {
 			gatfs.deleteFile(fileName);
+			//TODO: ConflictException
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the Size of the resource.
+	 * 
+	 * @return size of the resource in bytes
 	 * 
 	 * @see com.bradmcevoy.http.GetableResource#getContentLength()
 	 */
@@ -127,8 +148,8 @@ public class GridFileResource implements FileResource {
 		return gatfs.getSize(this.fileName);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Read the contents of the resource.
 	 * 
 	 * @see
 	 * com.bradmcevoy.http.GetableResource#sendContent(java.io.OutputStream,
@@ -140,8 +161,10 @@ public class GridFileResource implements FileResource {
 		//gatfs.readFile(, data)
 	}
 
-	/*
-	 * (non-Javadoc)
+	/** 
+	 * Return the MIME-Type of the GridFolderResource.
+	 * 
+	 * @return not implemented, returning always "text/html"
 	 * 
 	 * @see com.bradmcevoy.http.GetableResource#getContentType(java.lang.String)
 	 */
@@ -228,5 +251,4 @@ public class GridFileResource implements FileResource {
 	public String checkRedirect(Request arg0) {
 		return null;
 	}
-
 }
