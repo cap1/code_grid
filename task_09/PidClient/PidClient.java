@@ -27,21 +27,33 @@ public class PidClient {
 		if (args.length == 1) {
 			searchPid(args[0]);
 		}
+		//create
 		else if (args.length == 3) {
-			
+			serviceUser = args[1];
+			servicePwd = args[2];
+			createPid(args[0]);
+		}
+		//update
+		else if (args.length == 4) {
+			serviceUser = args[2];
+			servicePwd = args[3];
+			modifyPid(args[0], args[1]);
+		}
+		//info
+		else {
+			String info = "Number of arguemnts determines function:\n";
+			info += "\tjava PidClient $SomePid  -- Querry for $SomePid\n";
+			info += "\tjava PidClient $uri $user $pw -- Create new Handle from $uri with $user and $pw\n";
+			info += "\tjava PidClient $pid $newUri $user $ $pw -- Modify Handle $pid to new $uri with $user and $pw\n";
+
+			System.out.println(info);
 		}
 
-
-
-		//String pid = "11858/00-ZZZZ-0000-0000-0229-F";
-		//String pid = "11858/00-ZZZZ-0000-0001-4743-4";
-		String pid = "11858/00-STUD-0000-0000-13D9-3"; //christians own CID
-
-
+		//String pid = "11858/00-STUD-0000-0000-13D9-3"; //christians own CID
 		//createPid("https://github.com/cap1/pke-presentation/blob/master/presentation.pdf");
-		searchPid(pid);
-		modifyPid(pid);
-		searchPid(pid);
+		//searchPid(pid);
+		//modifyPid(pid);
+		//searchPid(pid);
 	}
 
 	public static void searchPid(String pid) throws IOException {
@@ -112,18 +124,11 @@ public class PidClient {
 
 	}
 
-	public static void modifyPid(String pid) throws IOException {
+	public static void modifyPid(String pid, String newUri) throws IOException {
 		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/write/modify";
 
-//		String modifiedUrl = "http://handle.gwdg.de/javadocs/";
-//		String oldTitle = "PIDService Documentation";
-//		String modifiedTitle = "PIDService Documentations";
-		String oldTitle = "";
-		String modifiedTitle = "Presentation on PKES";
 		String serviceParam1 = URLEncoder.encode(pid, "UTF-8");
-//		String serviceParam2 = URLEncoder.encode(modifiedUrl, "UTF-8");
-		String serviceParam3 = URLEncoder.encode(oldTitle, "UTF-8");
-		String serviceParam4 = URLEncoder.encode(modifiedTitle, "UTF-8");
+		String serviceParam2 = URLEncoder.encode(newUri, "UTF-8");
 
 		URL url = new URL(serviceUrl);
 		HttpURLConnection urlConnection = null;
@@ -152,9 +157,7 @@ public class PidClient {
 			OutputStreamWriter out = new OutputStreamWriter(
 					urlConnection.getOutputStream());
 			out.write("pid=" + serviceParam1);
-		//	out.write("&url=" + serviceParam2);
-			out.write("&oldtitle=" + serviceParam3);
-			out.write("&newtitle=" + serviceParam4);	//modify
+			out.write("&url=" + serviceParam2);
 			out.write("&encoding=xml");
 			out.close();
 
@@ -166,6 +169,7 @@ public class PidClient {
 			while ((decodedString = in.readLine()) != null) {
 				System.out.println(decodedString);
 			}
+
 			in.close();
 		} catch (IOException e) {
 			e.printStackTrace();
