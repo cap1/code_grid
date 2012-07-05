@@ -21,11 +21,18 @@ import sun.misc.BASE64Encoder;
 public class PidClient {
 	static String serviceUser = "griduser9";
 	static String servicePwd = "doLhj10En4";
+	final static boolean verbose = false;
 
 	public static void main(String[] args) throws Exception {
 		//check for PID
 		if (args.length == 1) {
-			searchPid(args[0]);
+			try {
+				searchPid(args[0]);
+			}
+			catch (IOException e) {
+				System.out.println("Could not find info for PID \"" + args[0] + "\".");
+				if (verbose) e.printStackTrace();
+			}
 		}
 		//create
 		else if (args.length == 3) {
