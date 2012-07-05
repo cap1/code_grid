@@ -68,4 +68,4 @@ javac -classpath \"$APPCLASSPATH:$FITS_HOME/xml/nlnz\" PidClient.java
 ##java -classpath "$APPCLASSPATH:$FITS_HOME/xml/nlnz" FitsClient
 
 #java -classpath "$APPCLASSPATH:$FITS_HOME/xml/nlnz" PidClient 11858/00-STUD-0000-0000-13D9-2 https://github.com/cap1/pke-report/blob/master/report.tex griduser9 doLhj10En4
-java -classpath "$APPCLASSPATH:$FITS_HOME/xml/nlnz" PidClient 11858/00-STUD-0000-0000-13D9-2
+#java -classpath "$APPCLASSPATH:$FITS_HOME/xml/nlnz" PidClient 11858/00-STUD-0000-0000-13D9-2

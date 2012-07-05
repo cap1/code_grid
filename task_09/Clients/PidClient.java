@@ -25,6 +25,7 @@ import edu.harvard.hul.ois.fits.*;
 import edu.harvard.hul.ois.fits.exceptions.FitsConfigurationException;
 import edu.harvard.hul.ois.fits.exceptions.FitsException;
 
+import java.util.regex.*;
 
 public class PidClient {
 	//hardcode for conviniece
@@ -76,15 +77,14 @@ public class PidClient {
 
 			}
 		}
-		if (args[0].equals("-c")) {
+		if (args[0].equals("-m")) {
 			//modify
 			String pid = args[1];
 			String field = args[2];
 			String value = args[3];
 			serviceUser = args[5];
 			servicePwd = args[6];
-
-
+			modifyPid(pid, field, value);
 
 		}
 		else {
@@ -104,18 +104,11 @@ public class PidClient {
 				servicePwd = args[2];
 				createPid(args[0]);
 			}
-			//update
-			else if (args.length == 4) {
-				serviceUser = args[2];
-				servicePwd = args[3];
-				modifyPid(args[0], "url", args[1]);
-			}
 			//info
 			else {
 				String info = "Number of arguemnts determines function:\n";
 				info += "\tjava PidClient $SomePid  -- Querry for $SomePid\n";
 				info += "\tjava PidClient $uri $user $pw -- Create new Handle from $uri with $user and $pw\n";
-				info += "\tjava PidClient $pid $newUri $user $ $pw -- Modify Handle $pid to new $uri with $user and $pw\n";
 
 				System.out.println(info);
 			}
@@ -303,9 +296,41 @@ public class PidClient {
 
 	}
 
+
+	public static String getPidValue(String pid, String field) throws IOException {
+		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/read/search";
+		String serviceParam = URLEncoder.encode(pid, "UTF-8");
+		String serviceParam1 = URLEncoder.encode(field, "UTF-8");
+
+		URL url = new URL(serviceUrl + "?" + "pid=" + serviceParam + "&encoding=xml");
+		URLConnection connection = url.openConnection();
+
+		BufferedReader in = new BufferedReader(new InputStreamReader(
+		connection.getInputStream()));
+
+		String decodedString;
+		Pattern p = Pattern.compile("[ \t\n\f\r]*<" + field + ">(.*)</" + field +">");
+		String value = null;
+		while ((decodedString = in.readLine()) != null) {
+			System.out.println(decodedString);
+			if (Pattern.matches("[ \t\n\f\r]*<" + field + ">.*", decodedString)) {
+				Matcher m = p.matcher(decodedString);
+				if (m.find( )) {
+					value = m.group(1);
+				}
+			}
+		}
+
+		in.close();
+		return value;
+	}
+
 	public static void modifyPid(String pid, String field, String value) throws IOException {
 		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/write/modify";
-
+		
+		String oldtitle = getPidValue(pid, "title");
+		String serviceParamOldtitle = URLEncoder.encode(oldtitle, "UTF-8");
+	
 		String serviceParam1 = URLEncoder.encode(pid, "UTF-8");
 		String serviceParam2 = URLEncoder.encode(value, "UTF-8");
 
@@ -336,6 +361,7 @@ public class PidClient {
 			OutputStreamWriter out = new OutputStreamWriter(
 					urlConnection.getOutputStream());
 			out.write("pid=" + serviceParam1);
+			out.write("&oldtitle=" + oldtitle);
 			out.write("&" + field + "=" + serviceParam2);
 			out.write("&encoding=xml");
 			out.close();
