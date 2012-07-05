@@ -25,6 +25,7 @@ import edu.harvard.hul.ois.fits.*;
 import edu.harvard.hul.ois.fits.exceptions.FitsConfigurationException;
 import edu.harvard.hul.ois.fits.exceptions.FitsException;
 
+
 public class PidClient {
 	//hardcode for conviniece
 	static String serviceUser = "griduser9";
@@ -32,11 +33,51 @@ public class PidClient {
 	final static boolean verbose = false;
 	
 	//the necessary FITS libs are located in FitsHome
-	public static String FitsHome = "~/fits-0.6.1/";
+	public static String FitsHome = ".";
 
 	public static void main(String[] args) throws Exception {
 		if (args[0].equals("-f")) {
 			System.out.println("foo");
+			//create with fits data
+			if (args.length == 5) {
+				String file = args[1];
+				serviceUser = args[3];
+				servicePwd = args[4];
+				String author = null;
+				String title = null;
+				String checksum;
+
+				checksum = md5(file);
+
+				try {
+					title = getFitsValue(file, "title");
+					author = getFitsValue(file, "author");
+				}
+				catch (FileNotFoundException e) {
+					System.out.println("Could not find file: " + file);
+					if (verbose) e.printStackTrace();
+				}
+				// got author and title so creat it with
+				if (title != null && author != null) {
+					try {
+						createPid(file, checksum, author, title);
+					}
+					catch (IOException e) {
+						System.out.println("Could not find info for PID \"" + args[0] + "\".");
+						if (verbose) e.printStackTrace();
+					}
+				}
+				else {
+					try {
+						createPid(file, checksum);
+					}
+					catch (IOException e) {
+						System.out.println("Could not find info for PID \"" + args[0] + "\".");
+						if (verbose) e.printStackTrace();
+					}
+
+				}
+			}
 		}
 		else {
 			//check for PID
@@ -95,6 +136,114 @@ public class PidClient {
 		in.close();
 	}
 
+	public static void createPid(String fileURL, String checksum) throws IOException {
+		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/write/create";
+
+		String title = fileURL;
+		String serviceParamFileURL = URLEncoder.encode(fileURL, "UTF-8");
+		String serviceParamChecksum = URLEncoder.encode(checksum, "UTF-8");
+
+		URL url = new URL(serviceUrl);
+		HttpURLConnection urlConnection = null;
+		BufferedReader in = null;
+		try {
+			urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setDoInput(true);
+			urlConnection.setDoOutput(true);
+			urlConnection.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
+			urlConnection.setRequestMethod("POST");
+
+			String authCred = serviceUser + ":" + servicePwd;
+			String encodedAuthCred = new sun.misc.BASE64Encoder()
+					.encode(authCred.getBytes());
+			urlConnection.setRequestProperty("Authorization", "Basic "
+					+ encodedAuthCred);
+			/*
+			 * Do not use sun.misc.* , see: "Sun proprietary API" 
+			 * instead, use "Commons Codec library" for Base64 Encoder
+			 * (http://commons.apache.org/codec/)
+			 * import org.apache.commons.codec.DecoderException; 
+			 * import org.apache.commons.codec.binary.Base64;
+			 */
+
+			OutputStreamWriter out = new OutputStreamWriter(
+					urlConnection.getOutputStream());
+			out.write("url=" + serviceParamFileURL);
+			out.write("&checksum=" + serviceParamChecksum);
+			out.write("&encoding=xml");
+			out.close();
+
+			in = new BufferedReader(new InputStreamReader(
+					urlConnection.getInputStream()));
+
+			String decodedString;
+
+			while ((decodedString = in.readLine()) != null) {
+				System.out.println(decodedString);
+			}
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void createPid(String fileURL, String checksum, String author, String title ) throws IOException {
+		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/write/create";
+
+		String serviceParamFileURL = URLEncoder.encode(fileURL, "UTF-8");
+		String serviceParamChecksum = URLEncoder.encode(checksum, "UTF-8");
+		String serviceParamAuthor = URLEncoder.encode(author, "UTF-8");
+		String serviceParamTitle = URLEncoder.encode(title, "UTF-8");
+
+		URL url = new URL(serviceUrl);
+		HttpURLConnection urlConnection = null;
+		BufferedReader in = null;
+		try {
+			urlConnection = (HttpURLConnection) url.openConnection();
+			urlConnection.setDoInput(true);
+			urlConnection.setDoOutput(true);
+			urlConnection.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
+			urlConnection.setRequestMethod("POST");
+
+			String authCred = serviceUser + ":" + servicePwd;
+			String encodedAuthCred = new sun.misc.BASE64Encoder()
+					.encode(authCred.getBytes());
+			urlConnection.setRequestProperty("Authorization", "Basic "
+					+ encodedAuthCred);
+			/*
+			 * Do not use sun.misc.* , see: "Sun proprietary API" 
+			 * instead, use "Commons Codec library" for Base64 Encoder
+			 * (http://commons.apache.org/codec/)
+			 * import org.apache.commons.codec.DecoderException; 
+			 * import org.apache.commons.codec.binary.Base64;
+			 */
+
+			OutputStreamWriter out = new OutputStreamWriter(
+					urlConnection.getOutputStream());
+			out.write("url=" + serviceParamFileURL);
+			out.write("&author=" + serviceParamAuthor);
+			out.write("&title=" + serviceParamTitle);
+			out.write("&checksum=" + serviceParamChecksum);
+			out.write("&encoding=xml");
+			out.close();
+
+			in = new BufferedReader(new InputStreamReader(
+					urlConnection.getInputStream()));
+
+			String decodedString;
+
+			while ((decodedString = in.readLine()) != null) {
+				System.out.println(decodedString);
+			}
+			in.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
 	public static void createPid(String fileURL) throws IOException {
 		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/write/create";
 
@@ -197,4 +346,53 @@ public class PidClient {
 			e.printStackTrace();
 		}
 	}
+	
+	public static String getFitsValue(String InputFile, String value) throws
+			FitsException, IOException, FitsConfigurationException,
+			FileNotFoundException, NoSuchAlgorithmException {
+		// Initializing fits
+		File testfile = new File(InputFile);
+		Fits fits = new Fits(FitsHome);
+		FitsOutput fitsOut = null;
+
+		// Examining Testfile
+		fitsOut = fits.examine(testfile);
+
+		// Save fits results to Disk
+	//	fitsOut.saveToDisk("test.xml");
+
+		// Extract Metadata of interest
+		return fitsOut.getMetadataElement(value).getValue();
+	}
+
+
+	//function to calculate MD5 checksum
+	public static String md5(String filename) throws NoSuchAlgorithmException,
+			FileNotFoundException {
+		MessageDigest digest = MessageDigest.getInstance("MD5");
+		// File f = new File("c:\\myfile.txt");
+		InputStream is = new FileInputStream(filename);
+		byte[] buffer = new byte[8192];
+		int read = 0;
+		try {
+			while ((read = is.read(buffer)) > 0) {
+				digest.update(buffer, 0, read);
+			}
+			byte[] md5sum = digest.digest();
+			BigInteger bigInt = new BigInteger(1, md5sum);
+			String output = bigInt.toString(16);
+			// System.out.println("MD5: " + output);
+			return output;
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to process file for MD5", e);
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				throw new RuntimeException(
+						"Unable to close input stream for MD5 calculation", e);
+			}
+		}
+	}
+
 }
