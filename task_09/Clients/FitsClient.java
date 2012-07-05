@@ -18,7 +18,7 @@ import edu.harvard.hul.ois.fits.exceptions.FitsException;
 
 public class FitsClient {
 	//the necessary FITS libs are located in FitsHome
-	public static String FitsHome = "~/fits-0.6.1/;
+	public static String FitsHome = "~/fits-0.6.1/";
 	//this file is analyzed by FITS
 	public static String InputFile = "/home/ ... (path to inputfile)";
 

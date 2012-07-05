@@ -15,47 +15,62 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import sun.misc.BASE64Encoder;
-//import org.apache.commons.codec.binary.Base64;
-//import org.apache.commons.codec.DecoderException; 
+
+import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.io.IOException;
+import java.math.BigInteger;
+import edu.harvard.hul.ois.fits.*;
+import edu.harvard.hul.ois.fits.exceptions.FitsConfigurationException;
+import edu.harvard.hul.ois.fits.exceptions.FitsException;
 
 public class PidClient {
+	//hardcode for conviniece
 	static String serviceUser = "griduser9";
 	static String servicePwd = "doLhj10En4";
 	final static boolean verbose = false;
+	
+	//the necessary FITS libs are located in FitsHome
+	public static String FitsHome = "~/fits-0.6.1/";
 
 	public static void main(String[] args) throws Exception {
-		//check for PID
-		if (args.length == 1) {
-			try {
-				searchPid(args[0]);
-			}
-			catch (IOException e) {
-				System.out.println("Could not find info for PID \"" + args[0] + "\".");
-				if (verbose) e.printStackTrace();
-			}
+		if (args[0].equals("-f")) {
+			System.out.println("foo");
 		}
-		//create
-		else if (args.length == 3) {
-			serviceUser = args[1];
-			servicePwd = args[2];
-			createPid(args[0]);
-		}
-		//update
-		else if (args.length == 4) {
-			serviceUser = args[2];
-			servicePwd = args[3];
-			modifyPid(args[0], args[1]);
-		}
-		//info
 		else {
-			String info = "Number of arguemnts determines function:\n";
-			info += "\tjava PidClient $SomePid  -- Querry for $SomePid\n";
-			info += "\tjava PidClient $uri $user $pw -- Create new Handle from $uri with $user and $pw\n";
-			info += "\tjava PidClient $pid $newUri $user $ $pw -- Modify Handle $pid to new $uri with $user and $pw\n";
+			//check for PID
+			if (args.length == 1) {
+				try {
+					searchPid(args[0]);
+				}
+				catch (IOException e) {
+					System.out.println("Could not find info for PID \"" + args[0] + "\".");
+					if (verbose) e.printStackTrace();
+				}
+			}
+			//create
+			else if (args.length == 3) {
+				serviceUser = args[1];
+				servicePwd = args[2];
+				createPid(args[0]);
+			}
+			//update
+			else if (args.length == 4) {
+				serviceUser = args[2];
+				servicePwd = args[3];
+				modifyPid(args[0], args[1]);
+			}
+			//info
+			else {
+				String info = "Number of arguemnts determines function:\n";
+				info += "\tjava PidClient $SomePid  -- Querry for $SomePid\n";
+				info += "\tjava PidClient $uri $user $pw -- Create new Handle from $uri with $user and $pw\n";
+				info += "\tjava PidClient $pid $newUri $user $ $pw -- Modify Handle $pid to new $uri with $user and $pw\n";
 
-			System.out.println(info);
+				System.out.println(info);
+			}
 		}
-
 		//String pid = "11858/00-STUD-0000-0000-13D9-3"; //christians own CID
 		//createPid("https://github.com/cap1/pke-presentation/blob/master/presentation.pdf");
 		//searchPid(pid);
