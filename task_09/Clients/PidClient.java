@@ -136,114 +136,6 @@ public class PidClient {
 		in.close();
 	}
 
-	public static void createPid(String fileURL, String checksum) throws IOException {
-		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/write/create";
-
-		String title = fileURL;
-		String serviceParamFileURL = URLEncoder.encode(fileURL, "UTF-8");
-		String serviceParamChecksum = URLEncoder.encode(checksum, "UTF-8");
-
-		URL url = new URL(serviceUrl);
-		HttpURLConnection urlConnection = null;
-		BufferedReader in = null;
-		try {
-			urlConnection = (HttpURLConnection) url.openConnection();
-			urlConnection.setDoInput(true);
-			urlConnection.setDoOutput(true);
-			urlConnection.setRequestProperty("Content-Type",
-					"application/x-www-form-urlencoded");
-			urlConnection.setRequestMethod("POST");
-
-			String authCred = serviceUser + ":" + servicePwd;
-			String encodedAuthCred = new sun.misc.BASE64Encoder()
-					.encode(authCred.getBytes());
-			urlConnection.setRequestProperty("Authorization", "Basic "
-					+ encodedAuthCred);
-			/*
-			 * Do not use sun.misc.* , see: "Sun proprietary API" 
-			 * instead, use "Commons Codec library" for Base64 Encoder
-			 * (http://commons.apache.org/codec/)
-			 * import org.apache.commons.codec.DecoderException; 
-			 * import org.apache.commons.codec.binary.Base64;
-			 */
-
-			OutputStreamWriter out = new OutputStreamWriter(
-					urlConnection.getOutputStream());
-			out.write("url=" + serviceParamFileURL);
-			out.write("&checksum=" + serviceParamChecksum);
-			out.write("&encoding=xml");
-			out.close();
-
-			in = new BufferedReader(new InputStreamReader(
-					urlConnection.getInputStream()));
-
-			String decodedString;
-
-			while ((decodedString = in.readLine()) != null) {
-				System.out.println(decodedString);
-			}
-			in.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public static void createPid(String fileURL, String checksum, String author, String title ) throws IOException {
-		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/write/create";
-
-		String serviceParamFileURL = URLEncoder.encode(fileURL, "UTF-8");
-		String serviceParamChecksum = URLEncoder.encode(checksum, "UTF-8");
-		String serviceParamAuthor = URLEncoder.encode(author, "UTF-8");
-		String serviceParamTitle = URLEncoder.encode(title, "UTF-8");
-
-		URL url = new URL(serviceUrl);
-		HttpURLConnection urlConnection = null;
-		BufferedReader in = null;
-		try {
-			urlConnection = (HttpURLConnection) url.openConnection();
-			urlConnection.setDoInput(true);
-			urlConnection.setDoOutput(true);
-			urlConnection.setRequestProperty("Content-Type",
-					"application/x-www-form-urlencoded");
-			urlConnection.setRequestMethod("POST");
-
-			String authCred = serviceUser + ":" + servicePwd;
-			String encodedAuthCred = new sun.misc.BASE64Encoder()
-					.encode(authCred.getBytes());
-			urlConnection.setRequestProperty("Authorization", "Basic "
-					+ encodedAuthCred);
-			/*
-			 * Do not use sun.misc.* , see: "Sun proprietary API" 
-			 * instead, use "Commons Codec library" for Base64 Encoder
-			 * (http://commons.apache.org/codec/)
-			 * import org.apache.commons.codec.DecoderException; 
-			 * import org.apache.commons.codec.binary.Base64;
-			 */
-
-			OutputStreamWriter out = new OutputStreamWriter(
-					urlConnection.getOutputStream());
-			out.write("url=" + serviceParamFileURL);
-			out.write("&author=" + serviceParamAuthor);
-			out.write("&title=" + serviceParamTitle);
-			out.write("&checksum=" + serviceParamChecksum);
-			out.write("&encoding=xml");
-			out.close();
-
-			in = new BufferedReader(new InputStreamReader(
-					urlConnection.getInputStream()));
-
-			String decodedString;
-
-			while ((decodedString = in.readLine()) != null) {
-				System.out.println(decodedString);
-			}
-			in.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
 	public static void createPid(String fileURL) throws IOException {
 		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/write/create";
 
@@ -295,7 +187,6 @@ public class PidClient {
 
 	}
 
-
 	public static String getPidValue(String pid, String field) throws IOException {
 		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/read/search";
 		String serviceParam = URLEncoder.encode(pid, "UTF-8");
@@ -331,7 +222,8 @@ public class PidClient {
 		String serviceParamOldtitle = URLEncoder.encode(oldtitle, "UTF-8");
 	
 		String serviceParam1 = URLEncoder.encode(pid, "UTF-8");
-		String serviceParam2 = URLEncoder.encode(value, "UTF-8");
+		String serviceParam2 = URLEncoder.encode(newUri, "UTF-8");
+		String serviceParam3 = URLEncoder.encode(oldtitle, "UTF-8");
 
 		URL url = new URL(serviceUrl);
 		HttpURLConnection urlConnection = null;
@@ -360,8 +252,8 @@ public class PidClient {
 			OutputStreamWriter out = new OutputStreamWriter(
 					urlConnection.getOutputStream());
 			out.write("pid=" + serviceParam1);
-			out.write("&oldtitle=" + oldtitle);
-			out.write("&" + field + "=" + serviceParam2);
+			out.write("&url=" + serviceParam2);
+			out.write("&oldtitle=" + serviceParam3);
 			out.write("&encoding=xml");
 			out.close();
 
