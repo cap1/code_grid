@@ -29,9 +29,7 @@ public class PidClient {
 		//check for PID
 		if (args.length == 1) {
 			try {
-				System.out.println(getPidValue(args[0], "url"));
-				getPidValue(args[0], "url");
-				//searchPid(args[0]);
+				searchPid(args[0]);
 			}
 			catch (IOException e) {
 				System.out.println("Could not find info for PID \"" + args[0] + "\".");
@@ -48,7 +46,6 @@ public class PidClient {
 		else if (args.length == 4) {
 			serviceUser = args[2];
 			servicePwd = args[3];
-			System.out.println(getPidValue(args[0], "url"));
 			modifyPid(args[0], args[1]);
 		}
 		//info
@@ -100,7 +97,8 @@ public class PidClient {
 		Pattern p = Pattern.compile("[ \t\n\f\r]*<" + field + ">(.*)</" + field +">");
 		String value = null;
 		while ((decodedString = in.readLine()) != null) {
-			if (Pattern.matches("[ \t\n\f\r]*<url>.*", decodedString)) {
+			System.out.println(decodedString);
+			if (Pattern.matches("[ \t\n\f\r]*<" + field + ">.*", decodedString)) {
 				Matcher m = p.matcher(decodedString);
 				if (m.find( )) {
 				value = m.group(1);
@@ -165,9 +163,15 @@ public class PidClient {
 
 	public static void modifyPid(String pid, String newUri) throws IOException {
 		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/write/modify";
+		
+		String oldtitle = getPidValue(pid, "title");
+
+		System.out.println(oldtitle);
 
 		String serviceParam1 = URLEncoder.encode(pid, "UTF-8");
 		String serviceParam2 = URLEncoder.encode(newUri, "UTF-8");
+		String serviceParam3 = URLEncoder.encode(oldtitle, "UTF-8");
+
 
 		URL url = new URL(serviceUrl);
 		HttpURLConnection urlConnection = null;
@@ -197,6 +201,7 @@ public class PidClient {
 					urlConnection.getOutputStream());
 			out.write("pid=" + serviceParam1);
 			out.write("&url=" + serviceParam2);
+			out.write("&oldtitle=" + serviceParam3);
 			out.write("&encoding=xml");
 			out.close();
 
