@@ -15,6 +15,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import sun.misc.BASE64Encoder;
+
+import java.util.regex.*;
 //import org.apache.commons.codec.binary.Base64;
 //import org.apache.commons.codec.DecoderException; 
 
@@ -27,7 +29,9 @@ public class PidClient {
 		//check for PID
 		if (args.length == 1) {
 			try {
-				searchPid(args[0]);
+				System.out.println(getPidValue(args[0], "url"));
+				getPidValue(args[0], "url");
+				//searchPid(args[0]);
 			}
 			catch (IOException e) {
 				System.out.println("Could not find info for PID \"" + args[0] + "\".");
@@ -44,6 +48,7 @@ public class PidClient {
 		else if (args.length == 4) {
 			serviceUser = args[2];
 			servicePwd = args[3];
+			System.out.println(getPidValue(args[0], "url"));
 			modifyPid(args[0], args[1]);
 		}
 		//info
@@ -78,6 +83,33 @@ public class PidClient {
 			System.out.println(decodedString);
 		}
 		in.close();
+	}
+
+	public static String getPidValue(String pid, String field) throws IOException {
+		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/read/search";
+		String serviceParam = URLEncoder.encode(pid, "UTF-8");
+		String serviceParam1 = URLEncoder.encode(field, "UTF-8");
+
+		URL url = new URL(serviceUrl + "?" + "pid=" + serviceParam + "&encoding=xml");
+		URLConnection connection = url.openConnection();
+
+		BufferedReader in = new BufferedReader(new InputStreamReader(
+				connection.getInputStream()));
+
+		String decodedString;
+		Pattern p = Pattern.compile("[ \t\n\f\r]*<" + field + ">(.*)</" + field +">");
+		String value = null;
+		while ((decodedString = in.readLine()) != null) {
+			if (Pattern.matches("[ \t\n\f\r]*<url>.*", decodedString)) {
+				Matcher m = p.matcher(decodedString);
+				if (m.find( )) {
+				value = m.group(1);
+				}
+			}
+		}
+
+		in.close();
+		return value;
 	}
 
 	public static void createPid(String fileURL) throws IOException {
