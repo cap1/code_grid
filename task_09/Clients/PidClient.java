@@ -82,10 +82,9 @@ public class PidClient {
 			String pid = args[1];
 			String field = args[2];
 			String value = args[3];
-			serviceUser = args[5];
-			servicePwd = args[6];
+			serviceUser = args[4];
+			servicePwd = args[5];
 			modifyPid(pid, field, value);
-
 		}
 		else {
 			//check for PID
@@ -312,7 +311,7 @@ public class PidClient {
 		Pattern p = Pattern.compile("[ \t\n\f\r]*<" + field + ">(.*)</" + field +">");
 		String value = null;
 		while ((decodedString = in.readLine()) != null) {
-			System.out.println(decodedString);
+//			System.out.println(decodedString);
 			if (Pattern.matches("[ \t\n\f\r]*<" + field + ">.*", decodedString)) {
 				Matcher m = p.matcher(decodedString);
 				if (m.find( )) {

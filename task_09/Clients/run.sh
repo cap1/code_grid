@@ -67,5 +67,5 @@ javac -classpath \"$APPCLASSPATH:$FITS_HOME/xml/nlnz\" PidClient.java
 ### Run FitsClient with the CLASSPATH set to the FITS libs:
 ##java -classpath "$APPCLASSPATH:$FITS_HOME/xml/nlnz" FitsClient
 
-#java -classpath "$APPCLASSPATH:$FITS_HOME/xml/nlnz" PidClient 11858/00-STUD-0000-0000-13D9-2 https://github.com/cap1/pke-report/blob/master/report.tex griduser9 doLhj10En4
-#java -classpath "$APPCLASSPATH:$FITS_HOME/xml/nlnz" PidClient 11858/00-STUD-0000-0000-13D9-2
+#java -classpath "$APPCLASSPATH:$FITS_HOME/xml/nlnz" PidClient 11858/00-STUD-0000-0000-13D9-3 https://github.com/cap1/pke-report/blob/master/report.tex griduser9 doLhj10En4
+java -classpath "$APPCLASSPATH:$FITS_HOME/xml/nlnz" PidClient -m 11858/00-STUD-0000-0000-13D9-3 authors Andere griduser9 doLhj10En4
