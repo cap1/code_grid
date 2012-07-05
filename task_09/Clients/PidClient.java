@@ -36,48 +36,56 @@ public class PidClient {
 	public static String FitsHome = ".";
 
 	public static void main(String[] args) throws Exception {
-		if (args[0].equals("-f")) {
-			System.out.println("foo");
-			//create with fits data
-			if (args.length == 5) {
-				String file = args[1];
-				serviceUser = args[3];
-				servicePwd = args[4];
-				String author = null;
-				String title = null;
-				String checksum;
+		if (args[0].equals("-c")) {
+		//create with fits data
+			String file = args[1];
+			serviceUser = args[3];
+			servicePwd = args[4];
+			String author = null;
+			String title = null;
+			String checksum;
 
-				checksum = md5(file);
+			checksum = md5(file);
 
+			try {
+				title = getFitsValue(file, "title");
+				author = getFitsValue(file, "author");
+			}
+			catch (FileNotFoundException e) {
+				System.out.println("Could not find file: " + file);
+				if (verbose) e.printStackTrace();
+			}
+			// got author and title so creat it with
+			if (title != null && author != null) {
 				try {
-					title = getFitsValue(file, "title");
-					author = getFitsValue(file, "author");
+					createPid(file, checksum, author, title);
 				}
-				catch (FileNotFoundException e) {
-					System.out.println("Could not find file: " + file);
+				catch (IOException e) {
+					System.out.println("Could not find info for PID \"" + args[0] + "\".");
 					if (verbose) e.printStackTrace();
 				}
-				// got author and title so creat it with
-				if (title != null && author != null) {
-					try {
-						createPid(file, checksum, author, title);
-					}
-					catch (IOException e) {
-						System.out.println("Could not find info for PID \"" + args[0] + "\".");
-						if (verbose) e.printStackTrace();
-					}
-				}
-				else {
-					try {
-						createPid(file, checksum);
-					}
-					catch (IOException e) {
-						System.out.println("Could not find info for PID \"" + args[0] + "\".");
-						if (verbose) e.printStackTrace();
-					}
-
-				}
 			}
+			else {
+				try {
+					createPid(file, checksum);
+				}
+				catch (IOException e) {
+					System.out.println("Could not find info for PID \"" + args[0] + "\".");
+					if (verbose) e.printStackTrace();
+				}
+
+			}
+		}
+		if (args[0].equals("-c")) {
+			//modify
+			String pid = args[1];
+			String field = args[2];
+			String value = args[3];
+			serviceUser = args[5];
+			servicePwd = args[6];
+
+
+
 		}
 		else {
 			//check for PID
@@ -100,7 +108,7 @@ public class PidClient {
 			else if (args.length == 4) {
 				serviceUser = args[2];
 				servicePwd = args[3];
-				modifyPid(args[0], args[1]);
+				modifyPid(args[0], "url", args[1]);
 			}
 			//info
 			else {
@@ -295,11 +303,11 @@ public class PidClient {
 
 	}
 
-	public static void modifyPid(String pid, String newUri) throws IOException {
+	public static void modifyPid(String pid, String field, String value) throws IOException {
 		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/write/modify";
 
 		String serviceParam1 = URLEncoder.encode(pid, "UTF-8");
-		String serviceParam2 = URLEncoder.encode(newUri, "UTF-8");
+		String serviceParam2 = URLEncoder.encode(value, "UTF-8");
 
 		URL url = new URL(serviceUrl);
 		HttpURLConnection urlConnection = null;
@@ -328,7 +336,7 @@ public class PidClient {
 			OutputStreamWriter out = new OutputStreamWriter(
 					urlConnection.getOutputStream());
 			out.write("pid=" + serviceParam1);
-			out.write("&url=" + serviceParam2);
+			out.write("&" + field + "=" + serviceParam2);
 			out.write("&encoding=xml");
 			out.close();
 
