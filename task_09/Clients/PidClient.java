@@ -28,7 +28,6 @@ import edu.harvard.hul.ois.fits.exceptions.FitsException;
 import java.util.regex.*;
 /**
  * Allows communication with a Handleserver.
- *
  */
 public class PidClient {
 	//more verbose output
@@ -119,6 +118,12 @@ public class PidClient {
 		//searchPid(pid);
 	}
 
+	/**
+	 *	Search for metadata stored with the given hanldle.
+	 *	Prints the found metadata as XML to STDOUT.
+	 *
+	 *	@param pid The Identifier to search for
+	 */
 	public static void searchPid(String pid) throws IOException {
 		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/read/search";
 		String serviceParam = URLEncoder.encode(pid, "UTF-8");
@@ -136,6 +141,14 @@ public class PidClient {
 		in.close();
 	}
 
+	/**
+	 * Create a new Handle.
+	 *
+	 * @param fileURL The Url to the new handle.
+	 * @param checksum shall contain the hash crated by a cryptograpic hash-function.
+	 * @param author Author of the file.
+	 * @param title Title of the file.
+	 */
 	public static void createPid(String fileURL, String checksum, String author, String title) throws IOException {
 		String serviceUrl = "http://hdl-test.gwdg.de:8080/pidservice/write/create";
 
@@ -316,6 +329,9 @@ public class PidClient {
 					value = m.group(1);
 				}
 			}
+		}
+		if (value == null) {
+			throw new IOException("Could not find " + field);
 		}
 
 		in.close();
