@@ -13,9 +13,12 @@ import chemtrail.GAThandler;
  */
 public class MyResourceFactory implements ResourceFactory {
 
+	private static final boolean debug = false;
+	private static final boolean verbose = true;
+	
 	private GAThandler gatfs;
 	String protocol = "gsiftp://";
-	String gridhost = "lima";
+	String gridhost = "";
 
 	public MyResourceFactory() {
 		System.out.println("Setting up GAT handler");
@@ -38,10 +41,31 @@ public class MyResourceFactory implements ResourceFactory {
 	 */
 	public Resource getResource(String host, String path) {
 		System.out.println("Host " + host + " Path " + path);
-
+		
+		String[] tokens = path.split("/");
+		String newpath = "";
+		
+		for (int i = 1; i< tokens.length; i++)
+		{
+			if(debug) System.out.println("Token #" + i + ": " + tokens[i]);
+			
+			if(i != 1) {
+				newpath = newpath + "/" + tokens[i];
+			}
+			else {
+				gridhost = tokens[i];
+			}
+		}
+		
+		if(path.equals("/")) {
+			//TODO Query for a list of available nodes, create folder resource with all available nodes being folder resources with / as parent folder resource
+		}
+		
+		
 		URI target = null;
 		try {
-			target = new URI(protocol + gridhost + "/" + path);
+			target = new URI(protocol + gridhost + "/" + newpath);
+			System.out.println("Generated URI:" + target);
 		} catch (URISyntaxException e1) {
 			e1.printStackTrace();
 		}
@@ -55,7 +79,7 @@ public class MyResourceFactory implements ResourceFactory {
 			}
 		}
 		else {
-			System.out.println("RESOURCEFACTORY: Requested file \""+target+"\" does not exist");
+			if(verbose) System.out.println("RESOURCEFACTORY: Requested resource \""+target+"\" does not exist");
 		}
 
 		return gfs;

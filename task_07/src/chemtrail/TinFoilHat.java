@@ -23,7 +23,7 @@ public class TinFoilHat {
 
 		GAThandler handler = new GAThandler("/tmp/x509up_u1013", "gridftp");
 
-		String host = "lima";
+		String host = "bombay";
 		String adaptor = "gsiftp://";
 		
 		// Testing creation of file with content
@@ -130,6 +130,15 @@ public class TinFoilHat {
 					true);
 		} catch (DirectoryNotEmptyException e) {
 			System.out.println(e);
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		// Testing creation of a new, empty dir
+		try {
+			handler.createDir(new URI(adaptor + host + "//tmp/blarg"));
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
