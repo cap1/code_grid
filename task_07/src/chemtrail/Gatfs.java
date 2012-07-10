@@ -1,7 +1,5 @@
 package chemtrail;
 
-import org.gridlab.gat.io.FileInputStream;
-
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
