@@ -1,0 +1,178 @@
+\section{Aufgabenblatt 5}
+\subsection{Cluster und Grid Computing}
+
+	\subsubsection{Zusammenhänge von Grid und Cluster Systemen}
+	{\scriptsize Stichpunkte: \textsl{Virtual Organization, Grid Site, Cluster Management, Cluster Clients, Grid Server, Grid Clients, Information Service, Meta-Scheduler} } \\
+	
+		Grid Systeme sind lose Zusammenschlüsse von Computersystemen.
+		Sie sind meist noch heterogener zusammengesetzt als Cluster Systeme.
+		Grid werden von Virtuellen Organisationen verwendet.
+		Sie gruppieren Gruppen von Benutzer nach definierten Eingenschaften
+		und legen der Zugriffsrechte innerhalb des Grids fest.
+		Die Verwaltung von Grid-Systemen erfolgt über eine Grid Middleware,
+		welche der verbindende Punkt zwischen den einzelnen Grid Sites ist.
+		
+		Cluster können teile von Grids sein.
+		Die Cluster werden dann zu Grid-Clients,
+		welche durch den Meta-Scheduler des Grids Jobs zugewiesen bekommen.
+		Die Jobs werden dann im Cluster auf die einzelnen Nodes verteilt.
+		
+		Das Grid-System wir durch den Information Service zusammengehalten.
+		Es ermöglicht den Zugriff auf wichtige Daten des Gridsystems.
+		Beispielsweise, welche Daten in welcher Gridsite lokal vorhanden sind,
+		oder wie stark eine Ressource ausgelastet ist, bzw. verfügbar ist.
+
+	\subsubsection{Was ist ein Meta-Scheduler?}
+		\label{sec:metascheduler}
+		Ein Meta-Scheduler vereint alle Scheduler eines Grids und
+		verteilt die Jobs an den jeweils optimalen Standort.
+		%ws-gram
+		
+	\subsubsection{Wozu benötigt man den Information Service?}
+		Er stellt Informationen über die Bestandteile eines Grids zur Verfügung.
+		Durch die geographische Verteilung der Grid-Ressourcen ist es nötig,
+		automatisch maschinenlesbare Informationen über die Grid-Ressourcen zu erhalten.
+		Insbesondere der Meta-Scheduler (\ref{sec:metascheduler}) ist darauf angewiesen.
+
+		Im Globus Toolkit übernimmt der \textsl{Monitoring and Discovery Service} diese 
+		Aufgabe.
+		
+	\subsubsection{Vorteile von Grid gegenüber Clustersystemen}
+		Grid Systeme sind meist größer als einzelne Cluster.
+		Abhängig von der Größe des Jobs und des Entstehenden Overheads
+		durch Verwendung des Grids,
+		muss abgewogen bzw. abgeschätzt werden wo der Job schneller beendet wird.
+		Bei der Verwendung des Grids muss in Betracht gezogen werden,
+		dass möglicher Weise große Datenmengen transportiert werden müssen
+		um Jobs zu starten.
+
+\subsection{Zertifikate und Proxy}
+	\subsubsection{Wofür werden Zertifikate im Grid eingesetzt?\\
+	Wie sieht der Prozess von Beantragung \& Ausstellung aus?}
+		Zur Identifikation von Entitäten (Hosts, Dienste, Nutzer, usw.) 
+		und für verschlüsselte Kommunikation im Grid.
+		Die X.509 Zertifikate werden von Zertifizierungsstellen (CA) signiert.
+		Besitzer eines signierten Zertifikates können kurzlebige Proxy-Zertifikate erstellen,
+		um ihre Rechte weiterzugeben.
+		
+	\subsubsection{Zusammenhang: Grid-Zertifikat, -Credentials, -Proxy, Credentials Delegation und öffentlicher Schlüssel}
+		Ein Grid-Zertifikat besteht aus einem öffentlichen und einem privaten Teil.
+		Analog zur asymmetrischen Verschlüsselung,
+		kann mit dem privaten Schlüssel etwas signiert werden.
+		Mit dem öffentlichen Schlüssel lässt sich die Signatur überprüfen.
+		Da der private Schlüssel nur dem Besitzer des Zertifikates bekannt ist,
+		können von ihm erstellte Proxy-Zertifikate auf ihre Gültigkeit überprüft werden.
+		
+		Auf die zeitlich beschränkten Proxy-Zertifikat gehen Zugriffsrechte des Ausstellenden Nutzers über,
+		was als Credentials-Delegation bezeichnet wird.
+		Mit Hilfe der Proxy-Zertifikate können Dienste und Jobs agieren
+		als wären sie der Ausstellende Nutzer
+		Anhand des öffentlichen Schlüssels des Nutzer kann die Authentizität 
+		der Zertifikate und die Nutzerzuordnung erfolgen.
+
+	\subsubsection{Prüfen von Grid-Zertifikaten}
+		Mit dem Befehl: \\
+		\texttt{openssl x509 -text -in /clusterwork/sda1/home/griduser9/.globus/usercert.pem}
+		lässt sich das Zertifikat anzeigen und überprüfen.
+		Zur gleichen Ausgabe führt der Befehl \texttt{grid-cert-info}.\\
+		Der Zertifikatsname (DN) ist \texttt{O=org, OU=Instant-Grid, OU=TestGrid, CN=griduser9}.
+		Der Ausgeber des Zertifikates ist \texttt{O=org, OU=Instant-Grid, OU=TestGrid, CN=Instant-Grid CA}
+		und es ist gültig von 21. Mai 2012, 09:37:35 GMT bis 21. Mai 2013, 09:37:35 GMT.
+		
+	\subsubsection{Prüfen von Grid-Proxy-Zertifikaten}
+		Mit dem Befehl:
+		\texttt{openssl x509 -text -in /tmp/x509up\_1013}
+		lässt sich das Proxy-zertifkat anzeigen und überprüfen.
+		Zur einer ähnliche Anzeige führt der Befehl 
+		\texttt{grid-proxy-info}.\\
+		Der Zertifikatsname (DN) ist \texttt{O=org, OU=Instant-Grid, OU=TestGrid, CN=griduser9, CN=857000645}.
+		Der Ausgeber des Zertifikates ist \texttt{O=org, OU=Instant-Grid, OU=TestGrid, CN=griduser9}
+		und es ist gültig vom 31. Mai 2012, 11:05:06 GMT bis zum 31. Mai, 23:10:06 GMT.
+		
+	\subsubsection{Verändern von Grid-Proxy Zertifikaten}
+		Mit dem Befehl
+		\texttt{grid-proxy-init -valid 168:0}
+		lässt sich das Zertifikat um eine Woche verlängern.
+		Um das Proxy-Zertifikat zu löschen kann der Befehl
+		\texttt{grid-proxy-destroy}
+		verwendet werden.
+
+\subsection{Grid-Umgebung}
+	\subsubsection{Service Container der Grid-Umgebung}
+		Im Container laufen die in Tabelle \ref{tab:containerServices} aufgeführten Dienste.
+		\begin{table}[ht!]
+			\begin{center}
+			\begin{tabular}{l l} 
+			\toprule
+			\multicolumn{2}{ c }{Dienste}	\\
+			\midrule
+				AuthzCalloutTestService				&		AdminService				\\
+				CASService		&                       SampleAuthzService		 \\ 
+				ContainerRegistryEntryService		&     SecureCounterService		 \\
+				ContainerRegistryService		&        SecurityTestService		  \\
+				CounterService		&                    ShutdownService			  \\
+				DefaultIndexService		&              SubscriptionManagerService\\
+				DefaultIndexServiceEntry		&        TestAuthzService			  \\
+				DefaultTriggerService		&           TestRPCService				\\
+				DefaultTriggerServiceEntry		&        TestService				\\
+				DelegationFactoryService		&        TestServiceRequest		 \\
+				DelegationService		&                 TestServiceWrongWSDL		  \\
+				DelegationTestService		&           TriggerFactoryService	  \\
+				InMemoryServiceGroup		&              TriggerService				\\
+				InMemoryServiceGroupEntry		&        TriggerServiceEntry		 \\
+				InMemoryServiceGroupFactory		&     Version				\\
+				IndexFactoryService		&              WidgetNotificationService \\
+				IndexService		&                    WidgetService				\\
+				IndexServiceEntry		&                 AuthenticationService	\\
+				ManagedExecutableJobService		&     IndexService				\\
+				ManagedJobFactoryService		&        IndexServiceEntry			 \\
+				ManagedMultiJobService		&           IndexService				\\
+				ManagementService		&                 IndexServiceEntry			\\
+				NotificationConsumerFactoryService	  &PersistenceTestSubscriptionManager		\\
+				NotificationConsumerService		&     ReliableFileTransferFactoryService		\\
+				NotificationTestService		&           ReliableFileTransferService		\\
+				RendezvousFactoryService		& 	\\
+			\bottomrule
+			\end{tabular}
+			\caption{Liste aller laufenden Dienste im Service Container.}
+			\label{tab:containerServices}
+			\end{center}
+		\end{table}
+
+	\subsubsection{Verfügbarkeit von Rssourcen in der Grid-Umgebeung}
+		In der Textdatei \texttt{/usr/bin/machines} stehen die Namen der verfügbaren Rechner.
+		Sie wird alle 30 Sekunden aktualisiert.\\
+		Mit dem Befehl \texttt{globus-job-run bombay /bin/hostname -f} lässt sich ein Job auf der 
+		Ressource \glqq bombay\grqq{} starten. Der Befehl im obrigen Beispiel ist \texttt{/bin/hostname -f}.
+		
+	\subsubsection{Datenverfügbarkeit in der Grid-Umgebung}
+		Mit \texttt{globus-url-copy} lassen sich Dateien ins und im Grid bewegen.
+		Beispielsweise die Datei \glqq moo\grqq{} nach \glqq bombay\grqq{}:\\
+		 \texttt{globus-url-copy -vb file:///\$PWD/moo gsiftp://bombay/\textasciitilde/}.
+
+\subsection{Job Submission mit dem Globus Toolkit}
+	% $>globusrun-ws submit -f job.xml
+	\subsubsection{Unterschied zwischen Fork und PBS Job}
+		Mit \texttt{fork} wird nur ein neuer Prozess
+		gestartet der von der Umgebung und dem Scheduling
+		allein dem lokalen Betriebssystem unterliegt.
+		
+		Ein PBS-Jobs unterliegt zusätzlich dem Scheduling Algorithmus des
+		Distributed Ressource Manangers % BUZZWORDONLYLINE!!!!11
+		oder möglicherweise auch einem Meta-Scheduler des Grids.
+	
+	\subsubsection{Dokumentieren von Grid-Jobs}
+		Mit dem Befehl
+		\begin{verbatim}
+		for i in \$(cat /usr/bin/machines); do 
+		globusrun-ws -submit -f job.xml -F https://\${i}:8443 \
+		/wsrf/services/ManagedJobFactoryService -factory-type PBS 
+		done
+		\end{verbatim}
+		kann man einen Job auf jeder Ressource starten.
+
+	
+		\lstinputlisting[language=XML]{./task_05/job.xml}
+		% MDS für Monitoring und Discovery
+		% $>wsrf-query
+
