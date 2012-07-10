@@ -3,7 +3,8 @@ package de.unigoe.sub.fe.goegrid.practicalcourse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
+import java.net.URISyntaxException; //import java.security.MessageDigest;
+//import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -32,48 +33,54 @@ import com.bradmcevoy.http.exceptions.NotAuthorizedException;
  * @author ralph.krimmel, christian.mueller
  */
 public class GridFolderResource implements FolderResource {
-	
-	//path to the directory
+
+	// path to the directory
 	URI dirName;
-	//handler to communicate with JavaGAT
+	// handler to communicate with JavaGAT
 	GAThandler gatfs;
-	//determine if verbose output is desired
+	// determine if verbose output is desired
 	private static final boolean verbose = true;
-	
+
 	/**
 	 * Construct a new Folder Ressource on the Grid
 	 * 
-	 * @param gatfs JavaGAT handler to communicate with the grid
-	 * @param dirName Path to the directory to work with
+	 * @param gatfs
+	 *            JavaGAT handler to communicate with the grid
+	 * @param dirName
+	 *            Path to the directory to work with
 	 */
-	GridFolderResource(	GAThandler gatfs, URI dirName) {
+	GridFolderResource(GAThandler gatfs, URI dirName) {
 		this.dirName = dirName;
 		this.gatfs = gatfs;
-		if(verbose) System.out.println("Creating Folder Resource: " + dirName);
+		if (verbose)
+			System.out.println("Creating Folder Resource: " + dirName);
 	}
 
 	/**
 	 * Create a new GridFolderRessource.
 	 * 
-	 * @param name name of the new resource
-	 * @param content 
+	 * @param name
+	 *            name of the new resource
+	 * @param content
 	 * @param length
 	 * @param type
 	 * 
 	 * @see com.bradmcevoy.http.PutableResource#createNew(java.lang.String,
-	 * java.io.InputStream, java.lang.Long, java.lang.String)
+	 *      java.io.InputStream, java.lang.Long, java.lang.String)
 	 */
 	public Resource createNew(String name, InputStream content, Long length,
 			String type) throws IOException, ConflictException,
 			NotAuthorizedException, BadRequestException {
 		GridFileResource result = null;
-		//System.out.println("GridFolderResource.createNew was called with parameters Name: "+ name + " InputStream " + content + " length " + length + " Type " + type);
+		// System.out.println("GridFolderResource.createNew was called with parameters Name: "+
+		// name + " InputStream " + content + " length " + length + " Type " +
+		// type);
 		try {
-			 URI fileURI = new URI(dirName + "/" + name);
-	
-			 gatfs.createFile(fileURI, content);
-			 result = new GridFileResource(gatfs,fileURI);
-			
+			URI fileURI = new URI(dirName + "/" + name);
+
+			gatfs.createFile(fileURI, content);
+			result = new GridFileResource(gatfs, fileURI);
+
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
@@ -83,57 +90,61 @@ public class GridFolderResource implements FolderResource {
 	/**
 	 * Create a new Directory.
 	 * 
-	 * @param name Name of the new Directory
+	 * @param name
+	 *            Name of the new Directory
 	 * 
 	 * @see com.bradmcevoy.http.MakeCollectionableResource#createCollection(java.
-	 * lang.String)
+	 *      lang.String)
 	 */
 	public CollectionResource createCollection(String name)
 			throws NotAuthorizedException, ConflictException,
 			BadRequestException {
 		GridFolderResource result = null;
-		//System.out.println("GridFolderResource.createNew was called with parameters Name: "+ name + " InputStream " + content + " length " + length + " Type " + type);
+		// System.out.println("GridFolderResource.createNew was called with parameters Name: "+
+		// name + " InputStream " + content + " length " + length + " Type " +
+		// type);
 		try {
-			 URI folderURI = new URI(dirName + "/" + name);
-	
-			 gatfs.createDir(folderURI);
-			 result = new GridFolderResource(gatfs,folderURI);
-			
+			URI folderURI = new URI(dirName + "/" + name);
+
+			gatfs.createDir(folderURI);
+			result = new GridFolderResource(gatfs, folderURI);
+
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-
-
-		System.out.println("GridFolderresource.createColletion called with parameters Name: " + name);
+		System.out
+				.println("GridFolderresource.createColletion called with parameters Name: "
+						+ name);
 		return result;
 	}
 
 	/**
 	 * Get the resource described by the given name.
-	 *
-	 * @param name name of the resource to obtain
-	 * @return the resource described by the given name. 
-	 *  
+	 * 
+	 * @param name
+	 *            name of the resource to obtain
+	 * @return the resource described by the given name.
+	 * 
 	 * @see com.bradmcevoy.http.CollectionResource#child(java.lang.String)
 	 */
 	public Resource child(String name) {
-		if(verbose) System.out.println("Trying to get item " + name);
+		if (verbose)
+			System.out.println("Trying to get item " + name);
 		URI item = null;
 		try {
 			item = new URI(name);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
-		//check if file or directory
-		if( gatfs.isDirectory(item)) {
-			GridFolderResource gfs = new GridFolderResource(gatfs,item);
+		// check if file or directory
+		if (gatfs.isDirectory(item)) {
+			GridFolderResource gfs = new GridFolderResource(gatfs, item);
 			return gfs;
-		}
-		else if(gatfs.isFile(item)){
-			GridFileResource gfs = new GridFileResource(gatfs,item);
+		} else if (gatfs.isFile(item)) {
+			GridFileResource gfs = new GridFileResource(gatfs, item);
 			return gfs;
 		}
 		return null;
@@ -147,28 +158,28 @@ public class GridFolderResource implements FolderResource {
 	 * @see com.bradmcevoy.http.CollectionResource#getChildren()
 	 */
 	public List<? extends Resource> getChildren() {
-		
+
 		ArrayList<URI> content;
 		List<Resource> result = new ArrayList<Resource>();
-		if(verbose) System.out.println("Trying to read directory " + this.dirName);
+		if (verbose)
+			System.out.println("Trying to read directory " + this.dirName);
 		try {
 			content = gatfs.readDir(this.dirName);
-			for(Iterator<URI> it = content.iterator();it.hasNext();)
-			{
+			for (Iterator<URI> it = content.iterator(); it.hasNext();) {
 				URI item = it.next();
-				
-				URI absoluteItem = new URI(this.dirName.toString() + item);
-				
-				if( gatfs.isDirectory(absoluteItem)) {
-					GridFolderResource gfs = new GridFolderResource(gatfs,absoluteItem);
+
+				URI absoluteItem = new URI(this.dirName.toString() + "/" + item);
+
+				if (gatfs.isDirectory(absoluteItem)) {
+					GridFolderResource gfs = new GridFolderResource(gatfs,
+							absoluteItem);
 					result.add(gfs);
-				}
-				else if (gatfs.isFile(absoluteItem)) {
-					GridFileResource gfs = new GridFileResource(gatfs,absoluteItem);
+				} else if (gatfs.isFile(absoluteItem)) {
+					GridFileResource gfs = new GridFileResource(gatfs,
+							absoluteItem);
 					result.add(gfs);
-				}
-				else {
-						System.out.println("Problem with " + absoluteItem);
+				} else {
+					System.out.println("Problem with " + absoluteItem);
 				}
 			}
 		} catch (URISyntaxException e) {
@@ -176,7 +187,7 @@ public class GridFolderResource implements FolderResource {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return result;		
+		return result;
 	}
 
 	/**
@@ -187,9 +198,9 @@ public class GridFolderResource implements FolderResource {
 	 * @see com.bradmcevoy.http.Resource#getName()
 	 */
 	public String getName() {
-		return gatfs.getBaseName(this.dirName);		
+		return gatfs.getBaseName(this.dirName);
 	}
-	
+
 	public URI getURI() {
 		return this.dirName;
 	}
@@ -202,51 +213,85 @@ public class GridFolderResource implements FolderResource {
 	 * @see com.bradmcevoy.http.Resource#getUniqueId()
 	 */
 	public String getUniqueId() {
-		return this.dirName.getPath();	
+		/*
+		 * MessageDigest md = null; try { md = MessageDigest.getInstance("MD5");
+		 * } catch (NoSuchAlgorithmException e) { e.printStackTrace(); } byte[]
+		 * thedigest = md.digest(this.dirName.toString().getBytes()); return new
+		 * String(thedigest);
+		 */
+		return this.dirName.toString();
 	}
 
 	/**
 	 * Copy the directory to a another directory and change its name.
 	 * 
-	 * @param destination New path for the directory
+	 * @param destination
+	 *            New path for the directory
 	 * @param new name of the directory
 	 * 
-	 * @seecom.bradmcevoy.http.CopyableResource#copyTo(com.bradmcevoy.http.
-	 * CollectionResource, java.lang.String)
+	 * @seecom.bradmcevoy.http.CopyableResource#copyTo(com.bradmcevoy.http. 
+	 *                                                                      CollectionResource
+	 *                                                                      ,
+	 *                                                                      java
+	 *                                                                      .
+	 *                                                                      lang
+	 *                                                                      .
+	 *                                                                      String
+	 *                                                                      )
 	 */
 	public void copyTo(CollectionResource destination, String newName) {
 		URI target = null;
-		if (verbose) System.out.println("Copy " + this.getName() + " to new collectionResource: " +  ((GridFolderResource) destination).getURI() +"/" +  newName);
+		if (verbose)
+			System.out.println("Copy " + this.getName()
+					+ " to new collectionResource: "
+					+ ((GridFolderResource) destination).getURI() + "/"
+					+ newName);
 		try {
-			target = new URI(((GridFolderResource) destination).getURI().toString() + "/" + newName);
+			target = new URI(((GridFolderResource) destination).getURI()
+					.toString()
+					+ "/" + newName);
 			gatfs.copyDir(dirName, target);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	
+
 	}
 
 	/**
 	 * Move the directory to a another directory and change its name.
 	 * 
-	 * @param destination New path for the directory
+	 * @param destination
+	 *            New path for the directory
 	 * @param new name of the directory
-	 *  
-	 * @seecom.bradmcevoy.http.MoveableResource#moveTo(com.bradmcevoy.http.
-	 * CollectionResource, java.lang.String)
+	 * 
+	 * @seecom.bradmcevoy.http.MoveableResource#moveTo(com.bradmcevoy.http. 
+	 *                                                                      CollectionResource
+	 *                                                                      ,
+	 *                                                                      java
+	 *                                                                      .
+	 *                                                                      lang
+	 *                                                                      .
+	 *                                                                      String
+	 *                                                                      )
 	 */
 	public void moveTo(CollectionResource destination, String newName)
 			throws ConflictException {
 		URI target = null;
-		if (verbose) System.out.println("Move " + dirName + " to new collectionResource: " +  ((GridFolderResource) destination).getURI() +"/" +  newName);
+		if (verbose)
+			System.out.println("Move " + dirName
+					+ " to new collectionResource: "
+					+ ((GridFolderResource) destination).getURI() + "/"
+					+ newName);
 		try {
-			target = new URI(((GridFolderResource) destination).getURI().toString() + "/" + newName);
+			target = new URI(((GridFolderResource) destination).getURI()
+					.toString()
+					+ "/" + newName);
 			gatfs.moveDir(dirName, target);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
-		} catch (FileExistsException e) {	
+		} catch (FileExistsException e) {
 			System.out.println(e);
 			throw new ConflictException(destination);
 		}
@@ -258,14 +303,15 @@ public class GridFolderResource implements FolderResource {
 	 * @see com.bradmcevoy.http.DeletableResource#delete()
 	 */
 	public void delete() throws ConflictException {
-		
-		if(verbose) System.out.println("Deleting file " + this.dirName);
+
+		if (verbose)
+			System.out.println("Deleting file " + this.dirName);
 		try {
-			gatfs.deleteDir(dirName,true);
+			gatfs.deleteDir(dirName, true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	/*
@@ -278,7 +324,7 @@ public class GridFolderResource implements FolderResource {
 		return 0l;
 	}
 
-	/** 
+	/**
 	 * Return the MIME-Type of the GridFolderResource.
 	 * 
 	 * @return not implemented, returning always "text/html"

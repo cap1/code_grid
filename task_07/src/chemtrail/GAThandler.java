@@ -38,8 +38,11 @@ public class GAThandler implements Gatfs {
 		Preferences prefs = new Preferences();
 		prefs.put("File.adaptor.name", adaptorname);
 		this.proxyCredentialBytes = readCertificate(certFileName);
+		
 	}
 
+	
+	
 	/**
 	 * Read the proxy-certificate from the File to a byte field. JavaGat
 	 * requires the certificate as a byte[] format
@@ -562,17 +565,15 @@ public class GAThandler implements Gatfs {
 
 		if (!todir.exists()) {
 			todir.mkdir();
-		} else {
-			//throw new FileExistsException(ToDir.toString());
 		}
 		if (dir.isDirectory()) {
 			for (int i = 0; i < dir.list().length; i++) {
 				File child = null;
 				try {
 					child = GAT.createFile(context, dir.list()[i]);
-
+					System.out.println("GATHANDLER: Child: " + child.toGATURI());
 					if (child.isDirectory()) {
-						child.mkdir();
+						child.copy(new URI(ToDir.toString()+ child.toGATURI()));
 						copyDir(new URI(dir.list()[i]), new URI(ToDir
 								.toString()
 								+ child.toGATURI()));

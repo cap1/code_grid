@@ -2,7 +2,8 @@ package de.unigoe.sub.fe.goegrid.practicalcourse;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
+import java.net.URISyntaxException; //import java.security.MessageDigest;
+//import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Map;
 
@@ -28,24 +29,28 @@ import chemtrail.GAThandler;
  */
 
 public class GridFileResource implements FileResource {
-	
-	//Path to the represented file
+
+	// Path to the represented file
 	URI fileName;
-	//Handler to communicate with the JavaGAT
+	// Handler to communicate with the JavaGAT
 	GAThandler gatfs;
-	//determine if verbose output is desired
+	// determine if verbose output is desired
 	private final static boolean verbose = true;
+	private final static boolean debug = true;
 
 	/**
 	 * Construct a new file resource.
 	 * 
-	 * @param gatfs Handler to communicate with JavaGAT
-	 * @param fileName Basename of the file
+	 * @param gatfs
+	 *            Handler to communicate with JavaGAT
+	 * @param fileName
+	 *            Basename of the file
 	 */
 	GridFileResource(GAThandler gatfs, URI fileName) {
 		this.fileName = fileName;
 		this.gatfs = gatfs;
-		//if(verbose) System.out.println("Creating File Resource: " + fileName);		
+		if (debug)
+			System.out.println("Creating File Resource: " + fileName);
 	}
 
 	/**
@@ -56,7 +61,8 @@ public class GridFileResource implements FileResource {
 	 * @see com.bradmcevoy.http.Resource#getName()
 	 */
 	public String getName() {
-		//if (verbose) System.out.println("Getting Name of file " + fileName);
+		if (debug)
+			System.out.println("Getting Name of file " + fileName);
 		return gatfs.getBaseName(this.fileName);
 	}
 
@@ -68,23 +74,44 @@ public class GridFileResource implements FileResource {
 	 * @see com.bradmcevoy.http.Resource#getUniqueId()
 	 */
 	public String getUniqueId() {
-		return fileName.getPath();
+		/*
+		 * MessageDigest md = null; try { md = MessageDigest.getInstance("MD5");
+		 * } catch (NoSuchAlgorithmException e) { e.printStackTrace(); } byte[]
+		 * thedigest = md.digest(this.fileName.toString().getBytes()); return
+		 * new String(thedigest);
+		 */
+		return this.fileName.toString();
 	}
 
 	/**
 	 * Copy this file to the destination under the given name.
 	 * 
-	 * @param destination the path to the copy of the resource
-	 * @param newName the name of the copy
+	 * @param destination
+	 *            the path to the copy of the resource
+	 * @param newName
+	 *            the name of the copy
 	 * 
-	 * @seecom.bradmcevoy.http.CopyableResource#copyTo(com.bradmcevoy.http.
-	 * CollectionResource, java.lang.String)
+	 * @seecom.bradmcevoy.http.CopyableResource#copyTo(com.bradmcevoy.http. 
+	 *                                                                      CollectionResource
+	 *                                                                      ,
+	 *                                                                      java
+	 *                                                                      .
+	 *                                                                      lang
+	 *                                                                      .
+	 *                                                                      String
+	 *                                                                      )
 	 */
 	public void copyTo(CollectionResource destination, String newName) {
- 		URI target = null;
-		if (verbose) System.out.println("Copy " + this.getName() + " to new collectionResource: " +  ((GridFolderResource) destination).getURI() +" New name " +  newName);
+		URI target = null;
+		if (verbose)
+			System.out.println("Copy " + this.getName()
+					+ " to new collectionResource: "
+					+ ((GridFolderResource) destination).getURI()
+					+ " New name " + newName);
 		try {
-			target = new URI(((GridFolderResource) destination).getURI().toString() + "/" + newName);
+			target = new URI(((GridFolderResource) destination).getURI()
+					.toString()
+					+ "/" + newName);
 			gatfs.copyFile(fileName, target);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -94,20 +121,33 @@ public class GridFileResource implements FileResource {
 	}
 
 	/**
-	 * Move the file to the destination with the given name.
-	 * NOT transaction safe, as the GATHandler implements it by copy and delete.
+	 * Move the file to the destination with the given name. NOT transaction
+	 * safe, as the GATHandler implements it by copy and delete.
 	 * 
 	 * @see chemtrail.GATHandler
 	 * 
-	 * @seecom.bradmcevoy.http.MoveableResource#moveTo(com.bradmcevoy.http.
-	 * CollectionResource, java.lang.String)
+	 * @seecom.bradmcevoy.http.MoveableResource#moveTo(com.bradmcevoy.http. 
+	 *                                                                      CollectionResource
+	 *                                                                      ,
+	 *                                                                      java
+	 *                                                                      .
+	 *                                                                      lang
+	 *                                                                      .
+	 *                                                                      String
+	 *                                                                      )
 	 */
 	public void moveTo(CollectionResource destination, String newName)
 			throws ConflictException {
- 		URI target = null;
-		if (verbose) System.out.println("Move " + fileName + " to new collectionResource: " +  ((GridFolderResource) destination).getURI() +" New name " +  newName);
+		URI target = null;
+		if (verbose)
+			System.out.println("Move " + fileName
+					+ " to new collectionResource: "
+					+ ((GridFolderResource) destination).getURI()
+					+ " New name " + newName);
 		try {
-			target = new URI(((GridFolderResource) destination).getURI().toString() + "/" + newName);
+			target = new URI(((GridFolderResource) destination).getURI()
+					.toString()
+					+ "/" + newName);
 			gatfs.moveFile(fileName, target);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
@@ -122,11 +162,12 @@ public class GridFileResource implements FileResource {
 	 * @see com.bradmcevoy.http.DeletableResource#delete()
 	 */
 	public void delete() throws ConflictException {
-		if(verbose) System.out.println("Deleting file " + this.fileName);
+		if (verbose)
+			System.out.println("Deleting file " + this.fileName);
 		try {
 			gatfs.deleteFile(fileName);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ConflictException(this);
 		}
 	}
 
@@ -138,24 +179,29 @@ public class GridFileResource implements FileResource {
 	 * @see com.bradmcevoy.http.GetableResource#getContentLength()
 	 */
 	public Long getContentLength() {
-		if(verbose) System.out.println("Getting size of file " + this.fileName);
+		if (verbose)
+			System.out.println("Getting size of file " + this.fileName);
 		return gatfs.getSize(this.fileName);
 	}
 
 	/**
 	 * Read the contents of the resource.
 	 * 
-	 * @see
-	 * com.bradmcevoy.http.GetableResource#sendContent(java.io.OutputStream,
-	 * com.bradmcevoy.http.Range, java.util.Map, java.lang.String)
+	 * @see com.bradmcevoy.http.GetableResource#sendContent(java.io.OutputStream,
+	 *      com.bradmcevoy.http.Range, java.util.Map, java.lang.String)
 	 */
 	public void sendContent(OutputStream out, Range arg1,
 			Map<String, String> arg2, String arg3) throws IOException,
 			NotAuthorizedException, BadRequestException {
-		//gatfs.readFile(, data) //TODO
+
+		try {
+			gatfs.readFile(this.fileName, out);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
-	/** 
+	/**
 	 * Return the MIME-Type of the GridFolderResource.
 	 * 
 	 * @return not implemented, returning always "text/html"
