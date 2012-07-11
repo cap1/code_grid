@@ -1,20 +1,25 @@
 \section{Aufgabenblatt 10}
 
 \subsection{Assignment 1}
-	\subsubsection{Blocking and non-blocking operations}
+	\subsubsection*{Blocking and non-blocking operations}
 		The lecture slides define a blocking operation in the following way: 
 		\textit{'Blocking: The return of the operation on a process ensures that the local resources (buffers) can be reused.'}
 		That means that a process cannot perform any other operation on the local buffers until the previous, blocking operation completly finished and the buffer is free to be reused. 
 		
 		In contradiction, \textit{'a non-blocking operation does not guarantee that the local resources can be reused after returning to the process.} That results into a behaviour that the process, that calls an operation cannot be sure if the buffer is reusable again because the operation instantly returns the control flow to the process.
-			
-	\subsubsection{Collective and point-to-point communication}
-				
+		
+		The standard \texttt{MPI\_Send()} and \texttt{MPI\_Recv()} are blocking operations.
 
+		
+	\subsubsection*{Collective and point-to-point communication}
+		Collective communication means that all processes in a MPI communicator	take part in it.  
+		Point-to-point means that the conversation just consists of a dialog between peers.
+		The standard \texttt{MPI\_Send()} and \texttt{MPI\_Recv()} use point-to-point communication. 
+		The functions \texttt{MPI\_Bcast()}, \texttt{MPI\_Reduce()}, \texttt{MPI\_Gather()}, \texttt{MPI\_Scatter()}, \texttt{MPI\_Allgather()} and \texttt{MPI\_Alltoall()} offer collective communication where a source can reach more than one target and vice versa.
 	
 \subsection{Assignment 2}
-	\subsubsection{Running the hello world example}
-After running the example from helloworld.c the output looked like this:
+	\subsubsection*{Running the hello world example}
+	After running the example from helloworld.c the output looked like this:
 \begin{verbatim}
 Hello MPI from the server process!
 Hello MPI!
@@ -32,5 +37,18 @@ Hello MPI!
 Hello MPI!
  mesg from 7 of 8 on c001
 \end{verbatim}
-Here we can see, that 
+	Here we can see, that first of all the process with rank 0 declares himself as ``server process". It then waits for incoming messages on each of the other ranks by calling a blocking \texttt{MPI\_Recv}. All the other processes having not rank 0 will send its hostname to the server process. The communication is held by point-to-point dialogs from each client process to the server process.
+	\subsubsection*{Scaling} 
+	The maximum amount of processes we can spawn is determined by the number of available/free nodes in the cluster. After setting the number of processes to $available nodes + 1$ the job was held in the queue and not executed.
+
+
+	\subsection{Assignment 3}
+		\lstinputlisting[language=C]{./task_10/single_ring_blocking.c}
+		
+
+
+
+
+
+
 
