@@ -1,5 +1,5 @@
 #!/bin/sh
-#PBS -N mpimultipass
-#PBS -l nodes=8
+#PBS -N mpidead
+#PBS -l nodes=2
 /usr/bin/mpiexec /var/local/torque/pbsuser9/code_grid/task_10/a.out
 
