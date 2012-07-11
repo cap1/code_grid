@@ -43,12 +43,40 @@ Hello MPI!
 
 
 	\subsection{Assignment 3}
+		The solution of assignment 3 can be seen in the following listing:
+
 		\lstinputlisting[language=C]{./task_10/single_ring_blocking.c}
+		The output of this program looks like this:
+
+\begin{verbatim}	
+Process 0 sent message to process 1
+Process 1 received message from process 0
+Process 1 sent message to process 2
+---Process sum is 1
+Process 2 received message from process 1
+Process 2 sent message to process 3
+---Process sum is 3
+Process 3 received message from process 2
+Process 3 sent message to process 4
+---Process sum is 6
+Process 4 received message from process 3
+Process 4 sent message to process 5
+---Process sum is 10
+Process 5 received message from process 4
+Process 5 sent message to process 6
+---Process sum is 15
+Process 6 received message from process 5
+Process 6 sent message to process 7
+---Process sum is 21
+Process 7 received message from process 6
+Process 7 sent message to process 0
+---Process sum is 28
+Process 0 received message from process 7
+---Process sum is 28
+\end{verbatim}
+
+	\subsection{Assignment 4}
 		
-
-
-
-
 
 
 
