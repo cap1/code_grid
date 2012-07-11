@@ -25,6 +25,10 @@ int main(int argc, char *argv[])
 		isrc = 1;
 		istag = ITAG_A;	
 		iretag = ITAG_B;
+		MPI_Ssend(&rmsg1, MSGLEN, MPI_FLOAT, idest, istag, MPI_COMM_WORLD); 
+		printf("Task %d has sent the message\n", irank);
+		MPI_Recv(&rmsg2, MSGLEN, MPI_FLOAT, isrc, iretag, MPI_COMM_WORLD, &recv_status);
+		printf("Task %d has sent the message\n", irank);
 	}
 	else if ( irank == 1 )
 	{
@@ -32,11 +36,12 @@ int main(int argc, char *argv[])
 		isrc = 0;
 		istag = ITAG_B;
 		iretag = ITAG_A;
+		MPI_Recv(&rmsg2, MSGLEN, MPI_FLOAT, isrc, iretag, MPI_COMM_WORLD, &recv_status);
+		printf("Task %d has received the message\n", irank);
+		MPI_Ssend(&rmsg1, MSGLEN, MPI_FLOAT, idest, istag, MPI_COMM_WORLD); 
+		printf("Task %d has sent the message\n", irank);
 	}
 
-	printf("Task %d has sent the message\n", irank);
-	MPI_Ssend(&rmsg1, MSGLEN, MPI_FLOAT, idest, istag, MPI_COMM_WORLD); 
-	MPI_Recv(&rmsg2, MSGLEN, MPI_FLOAT, isrc, iretag, MPI_COMM_WORLD, &recv_status);
-	printf("Task %d has received the message\n", irank);
 	MPI_Finalize();
+	return 0;
 }

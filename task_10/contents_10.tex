@@ -82,4 +82,17 @@ Process 0 received message from process 7
 
 
 	\subsection{Assignment 5}
+		The deadlock occurs because the two processors try to send and receive at the same time.
+		The sending operation operates synchronous,
+		so it will wait for the other process to receive the message.
+		As this happens on both processors,
+		the deadlock occurs.
+		A more simple solution than ours would be to use \texttt{MPI\_send},
+		which is asynchronous,
+		but than we need to assume that the system buffer deals with the problem.
+		But if we run out of system buffer,
+		the deadlock would still occur.
+		
+		Therefore we propose the following solution.
+		\lstinputlisting[language=C]{./task_10/deadlock.c}
 
