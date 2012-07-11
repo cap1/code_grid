@@ -1,3 +1,4 @@
+M
 #include <stdio.h>
 #include <mpi.h>
 
