@@ -82,7 +82,7 @@ public class SubmitJob implements GramJobListener  {
         // GramJob calls this method when a job changes its state
         // It's part of GramJobListener Interface
         public void stateChanged(GramJob job) {
-        		job.getFault().to
+     
                 StateEnumeration jobState = job.getState();
                 System.out.println("got state notifiation: job is in state " + jobState);
                 if (jobState.equals(StateEnumeration.Done)
