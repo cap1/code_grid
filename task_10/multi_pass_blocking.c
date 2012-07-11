@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
 	int recvfrom;
 	int ranksum=0;
 	int round=0;
+	const int verbose = 1;
 	char name[80];	
 
 	MPI_Status status;
@@ -21,9 +22,7 @@ int main(int argc, char *argv[])
   	
 	// Solve the assignment here
 
-	
-	
-	while(recvrank != myrank || round != nprocs-1)
+	while( round != nprocs)
 	{
 		if(myrank == nprocs-1)
 		{
@@ -45,23 +44,26 @@ int main(int argc, char *argv[])
 
 		if(myrank == round)
 		{
-			printf("STARTING ROUND NR. #%d\n",round);
+			if(verbose) printf("STARTING ROUND NR. #%d\n",round);
 			MPI_Send(&myrank,1,MPI_INT,sendto,myrank,MPI_COMM_WORLD);
-			//printf("Process %d sent message to process %d\n",myrank,myrank+1);
+			if(verbose) printf("Process %d sent message to process %d\n",myrank,sendto);
 			MPI_Recv(&recvrank,1,MPI_INT,recvfrom,recvfrom,MPI_COMM_WORLD,&status);
-			printf("Process %d received rank %d from process %d\n",myrank,recvrank,recvfrom);
-			printf("ROUND NR. #%d FINISHED\n",round);
-			continue;
+			if(verbose) printf("Process %d received rank %d from process %d\n",myrank,recvrank,recvfrom);
+			if(verbose) printf("ROUND NR. #%d FINISHED\n",round);
+		}
+		else
+		{
+			MPI_Recv(&recvrank,1,MPI_INT,recvfrom,recvfrom,MPI_COMM_WORLD,&status);
+			if(verbose) printf("Process %d received rank %d from process %d\n",myrank,recvrank,recvfrom);
+			MPI_Send(&recvrank,1,MPI_INT,sendto,myrank,MPI_COMM_WORLD);
+			if(verbose) printf("Process %d sent message to process %d\n",myrank,sendto);
+
 		}
 		round++;	
-		MPI_Recv(&recvrank,1,MPI_INT,recvfrom,recvfrom,MPI_COMM_WORLD,&status);
-		printf("Process %d received rank %d from process %d\n",myrank,recvrank,recvfrom);
-		MPI_Send(&recvrank,1,MPI_INT,sendto,myrank,MPI_COMM_WORLD);
-		//printf("Process %d sent message to process %d\n",myrank,sendto);
 		ranksum += recvrank;
-		//printf("---Process sum is %d\n",ranksum);
 	}
-
+	printf("Process %d sum = %d\n",myrank,ranksum);
+	
 
 	MPI_Finalize();
 	return 0;
